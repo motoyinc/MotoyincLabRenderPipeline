@@ -1,0 +1,14 @@
+/Assets/
+/Library/
+/Logs/
+/obj/
+/ProjectSettings/
+/Temp/
+/UserSettings/
+Assembly-CSharp.csproj
+/M.csproj
+/Motoyinc.RenderPipeline.Lab.Runtime.csproj
+/Motoyinc.RenderPipeline.MotoyincLab.Runtime.csproj
+/MTRP_Lab.sln
+/Packages/manifest.json
+/Packages/packages-lock.json
