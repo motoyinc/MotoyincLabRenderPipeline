@@ -9,6 +9,7 @@ using System.ComponentModel;
 using UnityEngine.Serialization;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.Universal;
 
 
 namespace UnityEngine.Rendering.MotoyincLab
@@ -75,6 +76,16 @@ namespace UnityEngine.Rendering.MotoyincLab
 			return rendererData;
 		}
 #endif
+		
+		// 配置好渲染相关的 Global Settings 并注册到窗口 ProjectSettings>Graphics
+		protected override void EnsureGlobalSettings()
+		{
+			base.EnsureGlobalSettings();
+#if UNITY_EDITOR
+			MotoyincLabRenderPipelineGlobalSettings.Ensure();
+#endif
+		}
+		
 	}
 }
 
