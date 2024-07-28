@@ -8,3 +8,4 @@
 - 关联包体：
   - com.unity.render-pipelines.core  **v17.0.3**
   - com.unity.shadergraph **v17.0.3**
+  - 关联包体在安装本MotoyincLabRP时会自动安装
