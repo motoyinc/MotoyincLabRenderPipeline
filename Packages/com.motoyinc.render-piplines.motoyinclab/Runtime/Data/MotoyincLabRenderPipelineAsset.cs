@@ -9,7 +9,7 @@ using System.ComponentModel;
 using UnityEngine.Serialization;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
-using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.MotoyincLab;
 
 
 namespace UnityEngine.Rendering.MotoyincLab

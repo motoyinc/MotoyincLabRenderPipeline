@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.Rendering;
 #endif
 
-namespace UnityEngine.Rendering.Universal
+namespace UnityEngine.Rendering.MotoyincLab
 {
     [SupportedOnRenderPipeline(typeof(MotoyincLabRenderPipelineAsset))]
     [DisplayName("Motoyinc Lab RP")]
