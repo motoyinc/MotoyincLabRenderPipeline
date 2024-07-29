@@ -21,11 +21,9 @@ namespace UnityEngine.Rendering.MotoyincLab
 		_2DRenderer,
 	}
 	
-	public class MotoyincLabRenderPipelineAsset:RenderPipelineAsset
+	
+	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset
 	{
-		[SerializeField] internal ScriptableRendererData[] m_RendererDataList = new ScriptableRendererData[1];
-		[SerializeField] internal int m_DefaultRendererIndex = 0;
-		
 		protected override RenderPipeline CreatePipeline()
 		{
 			var pipeline = new MotoyincLabRenderPipeline(this);
