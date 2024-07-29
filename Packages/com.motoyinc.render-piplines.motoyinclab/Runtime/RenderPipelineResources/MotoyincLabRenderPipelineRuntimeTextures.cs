@@ -9,7 +9,7 @@ namespace UnityEngine.Rendering.MotoyincLab
     public class MotoyincLabRenderPipelineRuntimeTextures : IRenderPipelineResources
     {
         // 资源版本
-        [SerializeField][HideInInspector] private int m_Version = 0;
+        [SerializeField][HideInInspector] private int m_Version = 1;
         public int version => m_Version;
         
         bool IRenderPipelineGraphicsSettings.isAvailableInPlayerBuild => true;

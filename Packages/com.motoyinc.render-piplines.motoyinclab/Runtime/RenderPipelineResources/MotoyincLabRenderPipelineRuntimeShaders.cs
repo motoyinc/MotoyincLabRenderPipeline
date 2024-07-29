@@ -1,6 +1,8 @@
 ﻿using System;
 namespace UnityEngine.Rendering.MotoyincLab
 {
+    [Serializable]
+    [SupportedOnRenderPipeline(typeof(MotoyincLabRenderPipelineAsset))]
     public class MotoyincLabRenderPipelineRuntimeShaders : IRenderPipelineResources
     {
         // 资源版本
