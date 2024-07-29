@@ -13,3 +13,5 @@ Assembly-CSharp.csproj
 /MTRP_Lab.sln
 /Packages/manifest.json
 /Packages/packages-lock.json
+/Motoyinc.RenderPipeline.MotoyincLab.ShaderLibrary.csproj
+/Motoyinc.RenderPipeline.MotoyincLab.Shaders.csproj
