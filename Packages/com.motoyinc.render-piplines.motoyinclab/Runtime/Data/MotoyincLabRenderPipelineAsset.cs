@@ -39,7 +39,7 @@ namespace UnityEngine.Rendering.MotoyincLab
 		{
 			if (m_Renderers == null)
 				return;
-			for (int i = 0; i < m_Renderers.Length; ++i)
+			for (int i = 0; i < m_Renderers.Length; i++)
 			{
 				DestroyRenderer(ref m_Renderers[i]);
 			}
@@ -60,7 +60,8 @@ namespace UnityEngine.Rendering.MotoyincLab
 			if (m_Renderers != null)
 			{
 				for(int i =0; i<m_Renderers.Length; ++i)
-					Debug.LogError($" m_Renderer[{i}] 旧渲染器数据没有被正常清除，新渲染器会直接覆盖掉旧渲染器");
+					if (m_Renderers[i] != null)
+						Debug.LogError($" m_Renderer[{i}] 旧渲染器数据没有被正常清除，新渲染器会直接覆盖掉旧渲染器");
 			}
 			
 			// 初始化渲染器列表
