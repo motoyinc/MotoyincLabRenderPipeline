@@ -24,6 +24,10 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 内置资产
         internal MotoyincLabRenderPipelineRuntimeTextures runtimeTextures { get; private set; }
         
+        public static MotoyincLabRenderPipelineAsset asset
+        {
+            get => GraphicsSettings.currentRenderPipeline as MotoyincLabRenderPipelineAsset;
+        }
         
         public MotoyincLabRenderPipeline(MotoyincLabRenderPipelineAsset asset)
         {
@@ -32,8 +36,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             // 载入管线内置资源
             // TODO: 管线资源无法正常加载
-            runtimeTextures = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeTextures>();
-            var shader = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeShaders>();
+            // runtimeTextures = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeTextures>();
+            // var shader = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeShaders>();
             
             // Blitter.Initialize(shader.coreBlitPS, shader.coreBlitColorAndDepthPS);
             RTHandles.Initialize(Screen.width, Screen.height);
@@ -46,8 +50,6 @@ namespace UnityEngine.Rendering.MotoyincLab
             GraphicsSettings.useScriptableRenderPipelineBatching = pipelineAsset.useSRPBatcher;
 
         }
-        
-        
     }
 }
 

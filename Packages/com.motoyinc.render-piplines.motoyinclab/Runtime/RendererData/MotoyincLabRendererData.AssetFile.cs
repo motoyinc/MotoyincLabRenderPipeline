@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using ShaderKeywordFilter = UnityEditor.ShaderKeywordFilter;
@@ -10,11 +10,8 @@ using UnityEngine.Experimental.Rendering;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
-    [Serializable, ReloadGroup, ExcludeFromPreset]
-    public class MotoyincLabRendererData : ScriptableRendererData
+    public partial class MotoyincLabRendererData
     {
-        public PostProcessData postProcessData = null;
-        
         // 创建Asset文件
 #if UNITY_EDITOR
         internal class CreateMotoyincLabRendererAsset : EndNameEditAction
@@ -32,8 +29,14 @@ namespace UnityEngine.Rendering.MotoyincLab
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateMotoyincLabRendererAsset>(), "new MotoyincLabRP RendererData.asset", null, null);
         }
 #endif
-    }
-    
-    
+        private void ReloadAllNullProperties()
+        {
+#if UNITY_EDITOR
+            ResourceReloader.TryReloadAllNullIn(this, MotoyincLabRenderPipelineAsset.packagePath);
 
+            if (postProcessData != null)
+                ResourceReloader.TryReloadAllNullIn(postProcessData, MotoyincLabRenderPipelineAsset.packagePath);
+#endif
+        }
+    }
 }
