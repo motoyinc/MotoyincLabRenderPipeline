@@ -17,7 +17,6 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         protected override ScriptableRenderer Create()
         {
-            // Renderer并不存在RenderData里，虽然是由RenderData创建的
             ReloadAllNullProperties();
             return new MotoyincLabRenderer(this);
         }
