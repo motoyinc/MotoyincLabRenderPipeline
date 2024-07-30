@@ -15,6 +15,13 @@ namespace UnityEngine.Rendering.MotoyincLab
     {
         public PostProcessData postProcessData = null;
         
+        protected override ScriptableRenderer Create()
+        {
+            // Renderer并不存在RenderData里，虽然是由RenderData创建的
+            ReloadAllNullProperties();
+            return new MotoyincLabRenderer(this);
+        }
+        
         // 创建Asset文件
 #if UNITY_EDITOR
         internal class CreateMotoyincLabRendererAsset : EndNameEditAction
@@ -32,8 +39,15 @@ namespace UnityEngine.Rendering.MotoyincLab
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateMotoyincLabRendererAsset>(), "new MotoyincLabRP RendererData.asset", null, null);
         }
 #endif
-    }
-    
-    
+        private void ReloadAllNullProperties()
+        {
+#if UNITY_EDITOR
+            ResourceReloader.TryReloadAllNullIn(this, MotoyincLabRenderPipelineAsset.packagePath);
 
+            if (postProcessData != null)
+                ResourceReloader.TryReloadAllNullIn(postProcessData, MotoyincLabRenderPipelineAsset.packagePath);
+#endif
+        }
+
+    }
 }

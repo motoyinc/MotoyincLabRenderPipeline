@@ -21,67 +21,58 @@ namespace UnityEngine.Rendering.MotoyincLab
 		_2DRenderer,
 	}
 	
-	
 	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset
 	{
 		protected override RenderPipeline CreatePipeline()
 		{
+			if (m_RendererDataList == null)
+				m_RendererDataList =  new ScriptableRendererData[1];
+			
+			DestroyRenderers();
 			var pipeline = new MotoyincLabRenderPipeline(this);
+			CreateRenderers();
+			
 			return pipeline;
 		}
 		
-		// 创建Asset文件
-#if UNITY_EDITOR
-		public static readonly string packagePath = "Packages/com.motoyinc.render-piplines.motoyinclab";
-		internal class CreateMotoyincLabRenderPipelineAsset : EndNameEditAction
+		internal void DestroyRenderers()
 		{
-			public override void Action(int instanceId, string pathName, string resourceFile)
+			if (m_Renderers == null)
+				return;
+			for (int i = 0; i < m_Renderers.Length; ++i)
 			{
-				// 创建Assets实例
-				var piplineAsset = CreateInstance<MotoyincLabRenderPipelineAsset>();
-				
-				// 创建RenderData
-				var rendererData = CreateRendererData(pathName, RendererType.MotoyincLabRenderer);
-				piplineAsset.m_RendererDataList[0] = rendererData;
-				
-				// 将实例创建成Assets文件
-				AssetDatabase.CreateAsset(piplineAsset, pathName);
-				ResourceReloader.ReloadAllNullIn(piplineAsset, packagePath);
+				DestroyRenderer(ref m_Renderers[i]);
 			}
 		}
 
-		[MenuItem("Assets/Create/MotoyincLabRP/MotoyincLabRP Asset")]
-		static void CreateUniversalPipeline()
+		void DestroyRenderer(ref ScriptableRenderer renderer)
 		{
-			ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateMotoyincLabRenderPipelineAsset>(), "new MotoyincLabRP.asset", null, null);
+			if (renderer != null)
+			{
+				renderer.Dispose();
+				renderer = null;
+			}
 		}
-		
-		internal static ScriptableRendererData CreateRendererData(string path, RendererType type, bool relativePath = true, string suffix = "RendererData")
+
+		void CreateRenderers()
 		{
-			// rendererData路径
-			string dataPathName;
-			if (relativePath)
-				dataPathName =
-					$"{Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path))}_{suffix}{Path.GetExtension(path)}";
-			else
-				dataPathName = path;
+			// 检查旧列表状态
+			if (m_Renderers != null)
+			{
+				for(int i =0; i<m_Renderers.Length; ++i)
+					Debug.LogError($" m_Renderer[{i}] 旧渲染器数据没有被正常清除，新渲染器会直接覆盖掉旧渲染器");
+			}
 			
-			//创建renderdata文件
-			var rendererData = CreateInstance<MotoyincLabRendererData>();
-			rendererData.postProcessData = PostProcessData.GetDefaultPostProcessData();
-			AssetDatabase.CreateAsset(rendererData,dataPathName);
-			ResourceReloader.ReloadAllNullIn(rendererData, packagePath);
-			return rendererData;
-		}
-#endif
-		
-		// 配置好渲染相关的 Global Settings 并注册到窗口 ProjectSettings>Graphics
-		protected override void EnsureGlobalSettings()
-		{
-			base.EnsureGlobalSettings();
-#if UNITY_EDITOR
-			MotoyincLabRenderPipelineGlobalSettings.Ensure();
-#endif
+			// 初始化渲染器列表
+			if (m_Renderers == null || m_Renderers.Length != m_RendererDataList.Length)
+				m_Renderers = new ScriptableRenderer[m_RendererDataList.Length];
+			
+			// 为每个 RendererData 分配一个渲染器 Renderer
+			for (int i = 0; i < m_RendererDataList.Length; ++i)
+			{
+				if (m_RendererDataList[i] != null)
+					m_Renderers[i] = m_RendererDataList[i].InternalCreateRenderer();
+			}
 		}
 		
 	}

@@ -10,9 +10,18 @@ using ShaderKeywordFilter = UnityEditor.ShaderKeywordFilter;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
-    public class ScriptableRendererData : ScriptableObject
+    public abstract class ScriptableRendererData : ScriptableObject
     {
+        // 用于判断当前 RendererData 是否过期
+        internal bool isInvalidated { get; set; }
+        
         [SerializeField] bool m_UseNativeRenderPass = false;
-    }
 
+        protected abstract ScriptableRenderer Create();
+        
+        internal ScriptableRenderer InternalCreateRenderer()
+        {
+            return Create();
+        }
+    }
 }
