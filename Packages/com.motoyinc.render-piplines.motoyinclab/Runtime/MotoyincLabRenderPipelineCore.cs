@@ -2,6 +2,7 @@
 {
     internal enum MLRPProfileId
     {
-        MotoyincLabRenderTotal
+        MotoyincLabRenderTotal,
+        RenderCameraStack
     }
 }
