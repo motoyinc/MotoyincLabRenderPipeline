@@ -1,6 +1,4 @@
-﻿using PlasticPipe.Server;
-
-namespace UnityEngine.Rendering.MotoyincLab
+﻿namespace UnityEngine.Rendering.MotoyincLab
 {
     public class MotoyincLabRenderer : ScriptableRenderer
     {
