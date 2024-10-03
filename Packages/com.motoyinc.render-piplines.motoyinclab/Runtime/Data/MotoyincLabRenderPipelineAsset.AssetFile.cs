@@ -35,7 +35,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         }
 
         [MenuItem("Assets/Create/MotoyincLabRP/MotoyincLabRP Asset")]
-        static void CreateUniversalPipeline()
+        static void CreateMotoyincLabPipeline()
         {
         	ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateMotoyincLabRenderPipelineAsset>(), "new MotoyincLabRP.asset", null, null);
         }
