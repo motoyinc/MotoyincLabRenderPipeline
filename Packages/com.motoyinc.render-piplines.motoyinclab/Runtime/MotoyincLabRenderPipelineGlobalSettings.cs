@@ -101,5 +101,22 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
             return _instance;
         }
+        
+        /// <summary>Default name when creating an URP Global Settings asset.</summary>
+        public const string defaultAssetName = "MotoyincLabRenderPipelineGlobalSettings";
+        internal static string defaultPath => $"Assets/{defaultAssetName}.asset";
+        
+        internal static MotoyincLabRenderPipelineGlobalSettings Ensure(bool canCreateNewAsset = true)
+        {
+            MotoyincLabRenderPipelineGlobalSettings currentInstance = GraphicsSettings.
+                GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as MotoyincLabRenderPipelineGlobalSettings;
+
+            if (RenderPipelineGlobalSettingsUtils.TryEnsure<MotoyincLabRenderPipelineGlobalSettings, MotoyincLabRenderPipeline>(ref currentInstance, defaultPath, canCreateNewAsset))
+            {
+                return currentInstance;
+            }
+
+            return null;
+        }
     }
 }
