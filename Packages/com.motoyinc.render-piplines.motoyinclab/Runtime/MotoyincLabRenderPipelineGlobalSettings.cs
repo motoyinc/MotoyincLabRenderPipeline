@@ -18,49 +18,88 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] RenderPipelineGraphicsSettingsContainer m_Settings = new();
         protected override List<IRenderPipelineGraphicsSettings> settingsList => m_Settings.settingsList;
         
-        internal bool IsAtLastVersion() => k_LastVersion == m_AssetVersion;
-        internal const int k_LastVersion = 8;
-        [SerializeField][FormerlySerializedAs("k_AssetVersion")]
-        internal int m_AssetVersion = k_LastVersion;
-        
-#if UNITY_EDITOR
-        public const string defaultAssetName = "MotoyincLabRPGlobalSettings";
-        internal static string defaultPath => $"Assets/{defaultAssetName}.asset";
+        // Define any global resources for your custom pipeline
+        [SerializeField] private MotoyincLabRenderPipelineRuntimeTextures runtimeTextures;
 
-        internal static MotoyincLabRenderPipelineGlobalSettings Ensure(bool canCreateNewAsset = true)
+        private static MotoyincLabRenderPipelineGlobalSettings _instance;
+        public static MotoyincLabRenderPipelineGlobalSettings instance
         {
-            MotoyincLabRenderPipelineGlobalSettings currentInstance =
-                GraphicsSettings.GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as
-                    MotoyincLabRenderPipelineGlobalSettings;
-            if (RenderPipelineGlobalSettingsUtils.TryEnsure<MotoyincLabRenderPipelineGlobalSettings, MotoyincLabRenderPipeline>(ref currentInstance, defaultPath, canCreateNewAsset))
+            get
             {
-                
-                if (currentInstance != null && !currentInstance.IsAtLastVersion())
+                if (_instance == null)
                 {
-                    UpgradeAsset(currentInstance.GetInstanceID());
-                    AssetDatabase.SaveAssetIfDirty(currentInstance);
+                    _instance = GraphicsSettings.GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as MotoyincLabRenderPipelineGlobalSettings;
                 }
-
-                return currentInstance;
+                return _instance;
             }
-            return currentInstance;
+            set => _instance = value;
         }
 
-        public override void Initialize(RenderPipelineGlobalSettings source = null)
-        {
+        // public MotoyincLabRenderPipelineRuntimeTextures RuntimeTextures => runtimeTextures;
+        public MotoyincLabRenderPipelineRuntimeTextures RuntimeTextures => GetOrCreateGraphicsSettings<MotoyincLabRenderPipelineRuntimeTextures>(this);
 
+        private static T GetOrCreateGraphicsSettings<T>(MotoyincLabRenderPipelineGlobalSettings data)
+            where T : class, IRenderPipelineResources, new()
+        {
+            T settings;
+
+            if (data.TryGet(typeof(T), out var baseSettings))
+            {
+                settings = baseSettings as T;
+            }
+            else
+            {
+                settings = new T();
+                data.Add(settings);
+            }
+
+            return settings;
+        }
+
+        [SettingsProvider]
+        public static SettingsProvider CreateMotoyincGraphicsSettingsProvider()
+        {
+            var provider = new SettingsProvider("Project/MotoyincLab Graphics", SettingsScope.Project)
+            {
+                guiHandler = (searchContext) =>
+                {
+                    instance = GraphicsSettings.GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as MotoyincLabRenderPipelineGlobalSettings;
+                    if (instance == null)
+                    {
+                        EditorGUILayout.HelpBox("No MotoyincLab global settings assigned. Please create or assign one.", MessageType.Warning);
+                        if (GUILayout.Button("Create New Settings"))
+                        {
+                            instance = CreateInstance<MotoyincLabRenderPipelineGlobalSettings>();
+                            string path = "Assets/MotoyincLabGlobalSettings.asset";
+                            AssetDatabase.CreateAsset(instance, path);
+                            GraphicsSettings.RegisterRenderPipelineSettings<MotoyincLabRenderPipeline>(instance);
+                        }
+                    }
+                    else
+                    {
+                        // Draw GUI to edit the settings
+                        SerializedObject serializedSettings = new SerializedObject(instance);
+                        EditorGUILayout.PropertyField(serializedSettings.FindProperty("runtimeTextures"), new GUIContent("Runtime Textures"));
+                        serializedSettings.ApplyModifiedProperties();
+                    }
+                },
+                keywords = SettingsProvider.GetSearchKeywordsFromSerializedObject(new SerializedObject(instance))
+            };
+            return provider;
         }
         
-#endif
-        public override void Reset()
+        public static MotoyincLabRenderPipelineGlobalSettings EnsureInstance()
         {
-            base.Reset();
-        }
+            if (_instance == null)
+            {
+                _instance = GraphicsSettings.GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as MotoyincLabRenderPipelineGlobalSettings;
 
-        public static void UpgradeAsset(int assetInstanceID)
-        {
-            if (EditorUtility.InstanceIDToObject(assetInstanceID) is not MotoyincLabRenderPipelineGlobalSettings asset)
-                return;
+                if (_instance == null)
+                {
+                    Debug.LogError("No MotoyincLabRenderPipelineGlobalSettings assigned. Please assign it in the Graphics Settings.");
+                }
+            }
+            return _instance;
         }
     }
 }

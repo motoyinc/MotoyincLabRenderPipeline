@@ -32,11 +32,28 @@ namespace UnityEngine.Rendering.MotoyincLab
         public MotoyincLabRenderPipeline(MotoyincLabRenderPipelineAsset asset)
         {
             pipelineAsset = asset;
-            m_GlobalSettings = MotoyincLabRenderPipelineGlobalSettings.instance;
+            
+            
+            
+            m_GlobalSettings = MotoyincLabRenderPipelineGlobalSettings.EnsureInstance();
             
             // 载入管线内置资源
             // TODO: 管线资源无法正常加载
-            // runtimeTextures = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeTextures>();
+            runtimeTextures = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeTextures>();
+            if (m_GlobalSettings == null)
+            {
+                Debug.LogError("Global Settings are not assigned.");
+            }
+            else if (m_GlobalSettings.RuntimeTextures.blueNoise64LTex != null)
+            {
+                Debug.Log("Runtime Textures are assigned.");
+            }
+            else
+            {
+                Debug.LogError("Runtime Textures are not assigned.");
+            }
+            
+            
             // var shader = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeShaders>();
             
             // Blitter.Initialize(shader.coreBlitPS, shader.coreBlitColorAndDepthPS);
