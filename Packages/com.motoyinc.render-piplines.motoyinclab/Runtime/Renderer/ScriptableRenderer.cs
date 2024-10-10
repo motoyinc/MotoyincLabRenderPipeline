@@ -19,5 +19,15 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             GC.SuppressFinalize(this);
         }
+        
+        public virtual int SupportedCameraStackingTypes()
+        {
+            return 0;
+        }
+
+        public bool SupportsCameraStackingType(CameraRenderType cameraRenderType)
+        {
+            return (SupportedCameraStackingTypes() & 1 << (int)cameraRenderType) != 0;
+        }
     }
 }

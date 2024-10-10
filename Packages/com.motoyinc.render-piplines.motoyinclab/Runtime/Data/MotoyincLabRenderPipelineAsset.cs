@@ -21,7 +21,7 @@ namespace UnityEngine.Rendering.MotoyincLab
 		_2DRenderer,
 	}
 	
-	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset
+	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset<MotoyincLabRenderPipeline>
 	{
 		protected override RenderPipeline CreatePipeline()
 		{
@@ -74,6 +74,18 @@ namespace UnityEngine.Rendering.MotoyincLab
 				if (m_RendererDataList[i] != null)
 					m_Renderers[i] = m_RendererDataList[i].InternalCreateRenderer();
 			}
+		}
+		
+		/// <summary>
+		/// Ensures Global Settings are ready and registered into GraphicsSettings
+		/// </summary>
+		protected override void EnsureGlobalSettings()
+		{
+			base.EnsureGlobalSettings();
+
+#if UNITY_EDITOR
+			MotoyincLabRenderPipelineGlobalSettings.Ensure();
+#endif
 		}
 		
 	}

@@ -14,12 +14,24 @@ namespace UnityEngine.Rendering.MotoyincLab
     public partial class MotoyincLabRendererData : ScriptableRendererData
     {
         public PostProcessData postProcessData = null;
+        [SerializeField] RenderingMode m_RenderingMode = RenderingMode.Forward;
         
         protected override ScriptableRenderer Create()
         {
             ReloadAllNullProperties();
             return new MotoyincLabRenderer(this);
         }
+
+        public RenderingMode renderingMode
+        {
+            get => m_RenderingMode;
+            set
+            {
+                SetDirty();
+                m_RenderingMode = value;
+            }
+        }
+        
         
     }
 }

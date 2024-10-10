@@ -21,7 +21,14 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         internal ScriptableRenderer InternalCreateRenderer()
         {
+            isInvalidated = false;
             return Create();
         }
+
+        public new void SetDirty()
+        {
+            isInvalidated = true;
+        }
+        
     }
 }

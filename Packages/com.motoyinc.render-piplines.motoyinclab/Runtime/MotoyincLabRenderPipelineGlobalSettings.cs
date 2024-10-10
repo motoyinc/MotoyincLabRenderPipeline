@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections.Generic;
 using UnityEngine.Rendering.MotoyincLab;
@@ -18,49 +19,30 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] RenderPipelineGraphicsSettingsContainer m_Settings = new();
         protected override List<IRenderPipelineGraphicsSettings> settingsList => m_Settings.settingsList;
         
-        internal bool IsAtLastVersion() => k_LastVersion == m_AssetVersion;
-        internal const int k_LastVersion = 8;
-        [SerializeField][FormerlySerializedAs("k_AssetVersion")]
-        internal int m_AssetVersion = k_LastVersion;
-        
-#if UNITY_EDITOR
-        public const string defaultAssetName = "MotoyincLabRPGlobalSettings";
-        internal static string defaultPath => $"Assets/{defaultAssetName}.asset";
+        private static MotoyincLabRenderPipelineGlobalSettings m_instance;
 
+#if UNITY_EDITOR
+        
+        /// <summary>Default name when creating an URP Global Settings asset.</summary>
+        public const string defaultAssetName = "MotoyincLabRenderPipelineGlobalSettings";
+        internal static string defaultPath => $"Assets/{defaultAssetName}.asset";
+        
         internal static MotoyincLabRenderPipelineGlobalSettings Ensure(bool canCreateNewAsset = true)
         {
-            MotoyincLabRenderPipelineGlobalSettings currentInstance =
-                GraphicsSettings.GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as
-                    MotoyincLabRenderPipelineGlobalSettings;
+            MotoyincLabRenderPipelineGlobalSettings currentInstance = GraphicsSettings.
+                GetSettingsForRenderPipeline<MotoyincLabRenderPipeline>() as MotoyincLabRenderPipelineGlobalSettings;
+
             if (RenderPipelineGlobalSettingsUtils.TryEnsure<MotoyincLabRenderPipelineGlobalSettings, MotoyincLabRenderPipeline>(ref currentInstance, defaultPath, canCreateNewAsset))
             {
-                
-                if (currentInstance != null && !currentInstance.IsAtLastVersion())
+                if (currentInstance != null)
                 {
-                    UpgradeAsset(currentInstance.GetInstanceID());
                     AssetDatabase.SaveAssetIfDirty(currentInstance);
                 }
-
                 return currentInstance;
             }
-            return currentInstance;
-        }
 
-        public override void Initialize(RenderPipelineGlobalSettings source = null)
-        {
-
+            return null;
         }
-        
 #endif
-        public override void Reset()
-        {
-            base.Reset();
-        }
-
-        public static void UpgradeAsset(int assetInstanceID)
-        {
-            if (EditorUtility.InstanceIDToObject(assetInstanceID) is not MotoyincLabRenderPipelineGlobalSettings asset)
-                return;
-        }
     }
 }

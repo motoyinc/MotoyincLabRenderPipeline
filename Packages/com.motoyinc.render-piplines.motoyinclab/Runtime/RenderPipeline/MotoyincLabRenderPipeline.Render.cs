@@ -24,6 +24,9 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             int cameraCount = cameras.Count;
             
+            // 进行摄象机排序
+            SortCameras(cameras);
+            
             // 摄像机循环
             using var profScope = new ProfilingScope(ProfilingSampler.Get(MLRPProfileId.MotoyincLabRenderTotal));
             using (new ContextRenderingScope(context, cameras))
@@ -31,12 +34,15 @@ namespace UnityEngine.Rendering.MotoyincLab
                 for (int i = 0; i < cameras.Count; ++i)
                 {
                     var camera = cameras[i];
+                    
+                    // 打开动态分辨率
                     RTHandles.SetHardwareDynamicResolutionState(true);
                     
                     // 判断摄像机是否存在 如果不存在直接抛出异常
                     if (camera == null)
                         throw new ArgumentNullException("camera");
 
+                    // 判断摄象机类型
                     if (isGameCamera(camera))
                     {
                         RenderCameraStack(context, camera);
@@ -53,6 +59,13 @@ namespace UnityEngine.Rendering.MotoyincLab
         public static bool isGameCamera(Camera camera)
         {
             return camera.cameraType == CameraType.Game || camera.cameraType == CameraType.VR;
+        }
+        
+        Comparison<Camera> cameraComparison = (camera1, camera2) => { return (int)camera1.depth - (int)camera2.depth; };
+        void SortCameras(List<Camera> cameras)
+        {
+            if (cameras.Count > 1)
+                cameras.Sort(cameraComparison);
         }
 
         // 性能分析用结构体

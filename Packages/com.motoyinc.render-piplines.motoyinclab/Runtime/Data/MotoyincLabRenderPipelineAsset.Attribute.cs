@@ -1,11 +1,8 @@
-﻿using Unity.VisualScripting.YamlDotNet.Core.Tokens;
-using UnityEngine.Serialization;
-
-namespace UnityEngine.Rendering.MotoyincLab
+﻿namespace UnityEngine.Rendering.MotoyincLab
 {
     public partial class MotoyincLabRenderPipelineAsset
     {
-        // Render Data
+        // Renderer Data 与 Renderere
         [SerializeField] internal ScriptableRendererData[] m_RendererDataList = new ScriptableRendererData[1];
         [SerializeField] internal int m_DefaultRendererIndex = 0;
         ScriptableRenderer[] m_Renderers = new ScriptableRenderer[1];
@@ -37,7 +34,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
         }
         
-        // 获取当前RendererData渲染器（只管当前RenderData的渲染器）
+        // 获取当前Renderer渲染器（只管当前RenderData的对应的Renderer渲染器）
         public ScriptableRenderer scriptableRenderer
         {
             get
@@ -57,7 +54,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
         }
         
-        // 按引索获取渲染器（会检查所以有RenderData的渲染器状态）
+        // 按引索获取Renderer渲染器（会检查所以有RenderData的对应的Renderer渲染器状态）
         public ScriptableRenderer GetRenderer(int index)
         {
             if (index == -1)
