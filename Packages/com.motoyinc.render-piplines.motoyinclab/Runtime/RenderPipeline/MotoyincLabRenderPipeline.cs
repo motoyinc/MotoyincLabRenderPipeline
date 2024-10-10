@@ -36,17 +36,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             m_GlobalSettings = MotoyincLabRenderPipelineGlobalSettings.instance;
             
             // 载入管线内置资源
-            // TODO: 管线资源无法正常加载
             runtimeTextures = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeTextures>();
-            if (runtimeTextures != null)
-            {
-                Debug.Log("GetRenderPipelineSettings: Runtime Textures are assigned.");
-            }
-            else
-            {
-                Debug.LogError("GetRenderPipelineSettings: Runtime Textures are not assigned.");
-            }
-            
             
             // var shader = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeShaders>();
             

@@ -21,7 +21,7 @@ namespace UnityEngine.Rendering.MotoyincLab
 		_2DRenderer,
 	}
 	
-	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset
+	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset<MotoyincLabRenderPipeline>
 	{
 		protected override RenderPipeline CreatePipeline()
 		{
