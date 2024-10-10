@@ -19,6 +19,7 @@ namespace UnityEngine.Rendering.MotoyincLab
     {
         // 管线数据
         private readonly MotoyincLabRenderPipelineAsset pipelineAsset;
+        
         private MotoyincLabRenderPipelineGlobalSettings m_GlobalSettings;
         
         // 内置资产
@@ -32,25 +33,18 @@ namespace UnityEngine.Rendering.MotoyincLab
         public MotoyincLabRenderPipeline(MotoyincLabRenderPipelineAsset asset)
         {
             pipelineAsset = asset;
-            
-            
-            
-            m_GlobalSettings = MotoyincLabRenderPipelineGlobalSettings.EnsureInstance();
+            m_GlobalSettings = MotoyincLabRenderPipelineGlobalSettings.instance;
             
             // 载入管线内置资源
             // TODO: 管线资源无法正常加载
             runtimeTextures = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeTextures>();
-            if (m_GlobalSettings == null)
+            if (runtimeTextures != null)
             {
-                Debug.LogError("Global Settings are not assigned.");
-            }
-            else if (m_GlobalSettings.RuntimeTextures.blueNoise64LTex != null)
-            {
-                Debug.Log("Runtime Textures are assigned.");
+                Debug.Log("GetRenderPipelineSettings: Runtime Textures are assigned.");
             }
             else
             {
-                Debug.LogError("Runtime Textures are not assigned.");
+                Debug.LogError("GetRenderPipelineSettings: Runtime Textures are not assigned.");
             }
             
             
