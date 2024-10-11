@@ -7,52 +7,35 @@ using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
-    public class MotoyincLabAdditionalCameraData : MonoBehaviour
+    public partial class MotoyincLabAdditionalCameraData : MonoBehaviour, ISerializationCallbackReceiver, IAdditionalData
     {
-        [SerializeField] private CameraRenderType m_cameraRenderType = CameraRenderType.Base;
-        [SerializeField] private List<Camera> m_cameras = new List<Camera>();
+        [HideInInspector] [SerializeField] float m_Version = 2;
+        public float version => m_Version;
         
-        public ScriptableRenderer scriptableRenderer
+        public void OnBeforeSerialize()
         {
-            get
+        }
+        
+        public void OnAfterDeserialize()
+        {
+            if (version <= 1)
             {
-                if (MotoyincLabRenderPipeline.asset == null)
-                    return null;
-                
-                var index = MotoyincLabRenderPipeline.asset.m_DefaultRendererIndex;
-                // TODO: 用户需要根据需求获取一个活跃状态的 Renderer Index 的一个方法
-                if (false)
-                    index = 0;
-                
-                return MotoyincLabRenderPipeline.asset.GetRenderer(index);
+                // 将旧属性，迁移给新属性
+                m_Version = 2;
             }
         }
+    }
 
-        public CameraRenderType renderType
+    public static class CameraExtensions
+    {
+        public static MotoyincLabAdditionalCameraData GetMotoyincLabAdditionalCameraData(this Camera camera)
         {
-            get => m_cameraRenderType;
-            set => m_cameraRenderType = value;
-        }
+            var gameObject = camera.gameObject;
+            bool componentExists = gameObject.TryGetComponent<MotoyincLabAdditionalCameraData>(out var cameraData);
+            if (!componentExists)
+                cameraData = gameObject.AddComponent<MotoyincLabAdditionalCameraData>();
 
-        public List<Camera> cameraStack
-        {
-            get
-            {
-                if (renderType != CameraRenderType.Base)
-                {
-                    var camera = gameObject.GetComponent<Camera>();
-                    Debug.LogWarning($"{camera.name} : 该摄像机的渲染类型是 {renderType}，该类型的摄像机不支持摄像机堆叠");
-                    return null;
-                }
-
-                if (!scriptableRenderer.SupportsCameraStackingType(CameraRenderType.Base))
-                {
-                    var camera = gameObject.GetComponent<Camera>();
-                    Debug.LogWarning($"{camera.name} : 渲染器不支持摄像机堆叠，请设置渲染器");
-                    return null;
-                }
-                return m_cameras;
-            }
+            return cameraData;
         }
     }
 }
