@@ -60,12 +60,12 @@ namespace UnityEngine.Rendering.MotoyincLab
 #endif
         
         // 配置好渲染相关的 Global Settings 并注册到窗口 ProjectSettings>Graphics
-//         protected override void EnsureGlobalSettings()
-//         {
-//         	base.EnsureGlobalSettings();
-// #if UNITY_EDITOR
-//         	MotoyincLabRenderPipelineGlobalSettings.Ensure();
-// #endif
-//         }
+        protected override void EnsureGlobalSettings()
+        {
+        	base.EnsureGlobalSettings();
+#if UNITY_EDITOR
+        	MotoyincLabRenderPipelineGlobalSettings.Ensure();
+#endif
+        }
     }
 }
