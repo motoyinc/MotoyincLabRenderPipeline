@@ -17,11 +17,26 @@ namespace UnityEditor.Rendering.MotoyincLab
     public class MotoyincLabRenderPipelineCameraEditor : CameraEditor
     {
         public Camera camera => target as Camera;
+        private MotoyincLabAdditionalCameraData additionalData;
 
-        public void OnEnable()
+        public new void OnEnable()
         {
+            if (camera == null)
+                return;
             base.OnEnable();
-            camera.GetMotoyincLabAdditionalCameraData();
+            if (camera == null)
+                return;
+            additionalData = camera.GetMotoyincLabAdditionalCameraData();
+            if (additionalData == null)
+                Debug.LogError($"无法找到在 <b>{camera.name}</b> 找到 <b>MotoyincLabAdditionalCameraData</b> 脚本");
+        }
+        
+        private SerializedObject serializedCamera;
+
+        public override void OnInspectorGUI()
+        {
+            serializedCamera.Update();
+            base.OnInspectorGUI();
         }
     }
     
