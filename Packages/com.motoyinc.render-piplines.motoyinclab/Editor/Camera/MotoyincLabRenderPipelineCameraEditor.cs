@@ -18,7 +18,7 @@ namespace UnityEditor.Rendering.MotoyincLab
     {
         public Camera camera => target as Camera;
 
-        public new void OnEnable()
+        public void OnEnable()
         {
             base.OnEnable();
             camera.GetMotoyincLabAdditionalCameraData();

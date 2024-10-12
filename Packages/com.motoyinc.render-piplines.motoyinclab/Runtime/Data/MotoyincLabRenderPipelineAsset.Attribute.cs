@@ -81,8 +81,14 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 用于检查当前序号是否允许获取Renderer
         internal bool ValidateRendererData(int index)
         {
-            if (index == -1) index = m_DefaultRendererIndex;
-            return index < m_RendererDataList.Length ? m_RendererDataList[index] != null : false;
+            // if (index == -1) index = m_DefaultRendererIndex;
+            // return index < m_RendererDataList.Length ? m_RendererDataList[index] != null : false;
+            if (index == -1)
+                index = m_DefaultRendererIndex;
+            if (index < m_RendererDataList.Length)
+                if (m_RendererDataList[index] != null)
+                    return true;
+            return false;
         }
 
     }

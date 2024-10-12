@@ -75,11 +75,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             {
                 if (MotoyincLabRenderPipeline.asset == null)
                     return null;
-                if (MotoyincLabRenderPipeline.asset.ValidateRendererData(m_RendererIndex))
+                if (!MotoyincLabRenderPipeline.asset.ValidateRendererData(m_RendererIndex))
                 {
                     int defaultIndex = MotoyincLabRenderPipeline.asset.m_DefaultRendererIndex;
                     Debug.LogWarning(
-                        $"相机指定的渲染器引索 <b>Renderer： {m_RendererIndex.ToString()}</b> 无法被找到。 <b>Camera：{camera.name}</b> 会使用默认渲染器进行渲染. <b>默认渲染器：{MotoyincLabRenderPipeline.asset.m_RendererDataList[defaultIndex].name}</b>",
+                        $"相机指定的渲染器引索 <b>Renderer： {m_RendererIndex.ToString()}</b> 无效。 <b>Camera：{camera.name}</b> 会使用默认渲染器进行渲染. <b>默认 RendererData：{MotoyincLabRenderPipeline.asset.m_RendererDataList[defaultIndex].name}</b>",
                         MotoyincLabRenderPipeline.asset);
                     return MotoyincLabRenderPipeline.asset.GetRenderer(defaultIndex);
                 }
