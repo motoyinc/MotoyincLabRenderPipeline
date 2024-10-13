@@ -35,14 +35,26 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         internal static void RenderSingleCameraInternal(ScriptableRenderContext context, Camera camera, ref MotoyincLabAdditionalCameraData additionalCameraData)
         {
-            // 获取 Renderer
-            camera.TryGetComponent<MotoyincLabAdditionalCameraData>(out var baseAdditionalCameraData);
-            ScriptableRenderer renderer = null;
-            if (baseAdditionalCameraData != null)
-                renderer = baseAdditionalCameraData.scriptableRenderer;
-            if (renderer == null || camera.cameraType == CameraType.SceneView)
-                renderer = asset.scriptableRenderer;
+            // 因为相机中 Overlay 和 Base 这两者属性
+            // 而一般 SceneView、Preview、Reflection 相机才会进入该方法 RenderSingleCameraInternal()
+            // Preview、Reflection 没有 additionalCameraData，而 SceneView 不需要使用 Overlay属性 的相机进行渲染
+            if (additionalCameraData != null && additionalCameraData.renderType != CameraRenderType.Base)
+            {
+                Debug.LogWarning($"<b>{camera.name}: </b>当前相机类型 <b>CameraRenderType {additionalCameraData.renderType}</b> 不支持渲染，本摄像机将会跳过");
+                return;
+            }
             
+            // ...
+            
+            // 创建和获取数据
+            var frameData = GetRenderer(camera, additionalCameraData).frameData;
+            var cameraData = CreateCameraData(frameData, camera, additionalCameraData, true);
+            
+            // 数据创建于处理
+            // ...
+            
+            // 进入渲染摄像机
+            RenderSingleCamera(context, cameraData);
         }
         
         
@@ -59,11 +71,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 return;
             
             // 获取 Renderer
-            ScriptableRenderer renderer = null;
-            if (baseAdditionalCameraData != null)
-                renderer = baseAdditionalCameraData.scriptableRenderer;
-            if (renderer == null || baseCamera.cameraType == CameraType.SceneView)
-                renderer = asset.scriptableRenderer;
+            var renderer = GetRenderer(baseCamera, baseAdditionalCameraData);
             
             // 检查是否支持摄像机堆叠
             List<Camera> cameraStack = null;
@@ -74,13 +82,17 @@ namespace UnityEngine.Rendering.MotoyincLab
                     cameraStack = baseAdditionalCameraData.cameraStack;
             }
 
-        }
-        
-        
-        // RenderCamera
-        static void RenderSingleCamera(ScriptableRenderContext context, MotoyincLabCameraData cameraData)
-        {
             
+            // ...
+            // 注：堆叠相机由于处理的摄像机类型会不一样，因此代码结构不会像下面这么简单
+            //    目前就先按照最简单的结构写
+            
+            // 创建和获取数据
+            var frameData = GetRenderer(baseCamera, baseAdditionalCameraData).frameData;
+            var cameraData = CreateCameraData(frameData, baseCamera, baseAdditionalCameraData, true);
+            
+            // 进入渲染摄像机
+            RenderSingleCamera(context, cameraData);
         }
         
     }
