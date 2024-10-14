@@ -10,6 +10,9 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public class ScriptableRenderer
     {
+        ContextContainer m_frameData = new();
+        internal ContextContainer frameData => m_frameData;
+        
         public ScriptableRenderer(ScriptableRendererData rendererData)
         {
             

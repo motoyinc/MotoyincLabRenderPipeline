@@ -15,3 +15,4 @@ Assembly-CSharp.csproj
 /Packages/packages-lock.json
 /Motoyinc.RenderPipeline.MotoyincLab.ShaderLibrary.csproj
 /Motoyinc.RenderPipeline.MotoyincLab.Shaders.csproj
+Motoyinc.RenderPipeline.MotoyincLab.Editor.csproj

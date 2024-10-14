@@ -76,18 +76,6 @@ namespace UnityEngine.Rendering.MotoyincLab
 			}
 		}
 		
-		/// <summary>
-		/// Ensures Global Settings are ready and registered into GraphicsSettings
-		/// </summary>
-		protected override void EnsureGlobalSettings()
-		{
-			base.EnsureGlobalSettings();
-
-#if UNITY_EDITOR
-			MotoyincLabRenderPipelineGlobalSettings.Ensure();
-#endif
-		}
-		
 	}
 }
 

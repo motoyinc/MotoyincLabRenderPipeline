@@ -1,8 +1,10 @@
-﻿namespace UnityEngine.Rendering.MotoyincLab
+﻿using System;
+
+namespace UnityEngine.Rendering.MotoyincLab
 {
     public partial class MotoyincLabRenderPipelineAsset
     {
-        // Renderer Data 与 Renderere
+        // Renderer Data 与 Renderer
         [SerializeField] internal ScriptableRendererData[] m_RendererDataList = new ScriptableRendererData[1];
         [SerializeField] internal int m_DefaultRendererIndex = 0;
         ScriptableRenderer[] m_Renderers = new ScriptableRenderer[1];
@@ -25,6 +27,8 @@
             set => m_UseSRPBatcher = value;
         }
 
+        public ReadOnlySpan<ScriptableRenderer> renderers => m_Renderers;
+        
         // 获取RendererData
         internal ScriptableRendererData scriptableRendererData
         {
@@ -34,7 +38,7 @@
             }
         }
         
-        // 获取当前Renderer渲染器（只管当前RenderData的对应的Renderer渲染器）
+        // 获取默认Renderer渲染器（会检测RenderData的对应的Renderer渲染器是否正常）
         public ScriptableRenderer scriptableRenderer
         {
             get
@@ -54,7 +58,7 @@
             }
         }
         
-        // 按引索获取Renderer渲染器（会检查所以有RenderData的对应的Renderer渲染器状态）
+        // 按引索获取Renderer渲染器（会检查所以有RenderData的对应的Renderer渲染器状态是否正常）
         public ScriptableRenderer GetRenderer(int index)
         {
             if (index == -1)
@@ -74,6 +78,18 @@
             return m_Renderers[index];
         }
         
+        // 用于检查当前序号是否允许获取Renderer
+        internal bool ValidateRendererData(int index)
+        {
+            // if (index == -1) index = m_DefaultRendererIndex;
+            // return index < m_RendererDataList.Length ? m_RendererDataList[index] != null : false;
+            if (index == -1)
+                index = m_DefaultRendererIndex;
+            if (index < m_RendererDataList.Length)
+                if (m_RendererDataList[index] != null)
+                    return true;
+            return false;
+        }
 
     }
 }
