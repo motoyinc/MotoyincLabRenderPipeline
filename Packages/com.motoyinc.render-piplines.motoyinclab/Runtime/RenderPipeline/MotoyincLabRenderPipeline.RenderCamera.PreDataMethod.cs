@@ -17,7 +17,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         static MotoyincLabCameraData CreateCameraData(ContextContainer frameData, Camera camera, MotoyincLabAdditionalCameraData additionalCameraData, bool resolveFinalTarget)
         {
             var renderer = GetRenderer(camera, additionalCameraData);
-            MotoyincLabCameraData cameraData = frameData.Create<MotoyincLabCameraData>();
+            MotoyincLabCameraData cameraData = frameData.GetOrCreate<MotoyincLabCameraData>();
+            cameraData.Reset();
             cameraData.camera = camera;
             
             // 数据处理
