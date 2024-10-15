@@ -1,0 +1,75 @@
+﻿namespace UnityEngine.Rendering.MotoyincLab
+{
+    public struct RenderingData
+    {
+        internal ContextContainer frameData;
+        internal CameraData cameraData;
+        internal LightData lightData;
+        internal ShadowData shadowData;
+        internal PostProcessingData postProcessingData;
+
+        internal RenderingData(ContextContainer frameData)
+        {
+            this.frameData = frameData;
+            cameraData = new CameraData(frameData);
+            lightData = new LightData(frameData);
+            shadowData = new ShadowData(frameData);
+            postProcessingData = new PostProcessingData(frameData);
+        }
+        internal MotoyincLabRenderingData MotoyincLabRenderingData => frameData.Get<MotoyincLabRenderingData>();
+
+        // Non-rendergraph path only. Do NOT use with rendergraph!
+        internal ref CommandBuffer commandBuffer
+        {
+            get
+            {
+                ref var cmd = ref frameData.Get<MotoyincLabRenderingData>().m_CommandBuffer;
+                if (cmd == null)
+                    Debug.LogError("RenderingData.commandBuffer is null. RenderGraph does not support this property. Please use the command buffer provided by the RenderGraphContext.");
+
+                return ref cmd;
+            }
+        }
+        
+    }
+    
+    public struct CameraData
+    {
+        internal ContextContainer frameData;
+
+        internal CameraData(ContextContainer frameData)
+        {
+            this.frameData = frameData;
+        }
+    }
+    
+    public struct LightData
+    {
+        internal ContextContainer frameData;
+
+        internal LightData(ContextContainer frameData)
+        {
+            this.frameData = frameData;
+        }
+    }
+    
+    public struct ShadowData
+    {
+        internal ContextContainer frameData;
+
+        internal ShadowData(ContextContainer frameData)
+        {
+            this.frameData = frameData;
+        }
+    }
+    
+    public struct PostProcessingData
+    {
+        internal ContextContainer frameData;
+
+        internal PostProcessingData(ContextContainer frameData)
+        {
+            this.frameData = frameData;
+        }
+    }
+}
