@@ -19,31 +19,43 @@ namespace UnityEngine.Rendering.MotoyincLab
             CommandBuffer cmd = CommandBufferPool.Get();
             CommandBuffer cmdScope = cmd;
             
-            
             // 使用帧数据
             using ContextContainer frameData = renderer.frameData;
             
-            // 创建帧数据
-            var data = frameData.Create<MotoyincLabRenderingData>();
             
-            // 整理帧数据
-            CreateRenderingData(frameData, asset, cmd, false, cameraData.renderer);
-            RenderingData legacyRenderingData = new RenderingData(frameData);
+            var data = frameData.Create<MotoyincLabRenderingData>(); 
+            var cameraMetadataSampler = CameraMetadataCache.GetCached(camera).sampler;
+            using (new ProfilingScope(cmdScope, cameraMetadataSampler))
+            {
+                // 渲染操作
+                cmd.ClearRenderTarget(true, true, Color.black);
+                context.ExecuteCommandBuffer(cmd);
+                cmd.Clear();
+                
+                // 整理帧数据
+                using (new ProfilingScope(Profiling.Pipeline.initializeRenderingData))
+                {
+                    CreateRenderingData(frameData, asset, cmd, false, cameraData.renderer);
+                }
+                RenderingData legacyRenderingData = new RenderingData(frameData);
             
-            // 渲染操作
-            cmd.ClearRenderTarget(true, true, Color.black);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
+                // 渲染器
+                using (new ProfilingScope(Profiling.Pipeline.Renderer.setup))
+                {
+                    renderer.Setup(context, ref legacyRenderingData);
+                }
+                renderer.Execute(context, ref legacyRenderingData);
+            }
             
-            // 渲染器
-            renderer.Setup(context, ref legacyRenderingData);
-            renderer.Execute(context, ref legacyRenderingData);
-            
+            // 释放cmd对象
             context.ExecuteCommandBuffer(cmd); 
             CommandBufferPool.Release(cmd);
             
-            context.Submit();
-            
+            // 提交渲染
+            using (new ProfilingScope(Profiling.Pipeline.Context.submit))
+            {
+                context.Submit();
+            }
             ScriptableRenderer.current = null;
         }
         
