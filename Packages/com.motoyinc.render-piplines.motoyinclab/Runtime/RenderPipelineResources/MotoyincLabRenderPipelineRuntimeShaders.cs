@@ -12,7 +12,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 管线Shader资源
         bool IRenderPipelineGraphicsSettings.isAvailableInPlayerBuild => true;
         [SerializeField]
-        [ResourcePath("Shaders/Utils/CoreBlit.shader")]
+        // [ResourcePath("Shaders/Utils/CoreBlit.shader")]
         internal Shader m_CoreBlitPS;
         
         public Shader coreBlitPS
@@ -22,7 +22,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         }
 
         [SerializeField]
-        [ResourcePath("Shaders/Utils/CoreBlitColorAndDepth.shader")]
+        // [ResourcePath("Shaders/Utils/CoreBlitColorAndDepth.shader")]
         internal Shader m_CoreBlitColorAndDepthPS;
         
         public Shader coreBlitColorAndDepthPS

@@ -45,12 +45,19 @@ namespace UnityEngine.Rendering.MotoyincLab
                     // 判断摄象机类型
                     if (isGameCamera(camera))
                     {
-                        RenderCameraStack(context, camera);
+                        using (new CameraRenderingScope(context, camera))
+                        {
+                            RenderCameraStack(context, camera);
+                        }
                     }
                     else
                     {
-                        RenderSingleCameraInternal(context,camera);
+                        using (new CameraRenderingScope(context, camera))
+                        {
+                            RenderSingleCameraInternal(context,camera);
+                        }
                     }
+                    
                 }
             }
             
@@ -67,35 +74,6 @@ namespace UnityEngine.Rendering.MotoyincLab
             if (cameras.Count > 1)
                 cameras.Sort(cameraComparison);
         }
-
-        // 性能分析用结构体
-        readonly struct ContextRenderingScope : IDisposable
-        {
-            private static readonly ProfilingSampler beginContextRenderingSampler = new ProfilingSampler($"{nameof(RenderPipeline)}.{nameof(BeginContextRendering)}");
-            private static readonly ProfilingSampler endContextRenderingSampler = new ProfilingSampler($"{nameof(RenderPipeline)}.{nameof(EndContextRendering)}");
-            private readonly ScriptableRenderContext m_Context;
-            private readonly List<Camera> m_Cameras;
-            
-            public ContextRenderingScope(ScriptableRenderContext context, List<Camera> cameras)
-            {
-                m_Context = context;
-                m_Cameras = cameras;
-                using (new ProfilingScope(beginContextRenderingSampler))
-                {
-                    BeginContextRendering(m_Context, m_Cameras);
-                }
-            }
-            
-            public void Dispose()
-            {
-                using (new ProfilingScope(endContextRenderingSampler))
-                {
-                    EndContextRendering(m_Context, m_Cameras);
-                }
-            }
-        }
-
-        
 
     }
 }

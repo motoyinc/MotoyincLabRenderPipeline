@@ -1,6 +1,6 @@
 ﻿namespace UnityEngine.Rendering.MotoyincLab
 {
-    public class MotoyincLabRenderer : ScriptableRenderer
+    public sealed partial class MotoyincLabRenderer : ScriptableRenderer
     {
         private RenderingMode m_RenderingMode;
         

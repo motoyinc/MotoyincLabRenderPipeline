@@ -8,10 +8,12 @@ using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
-    public class ScriptableRenderer
+    public abstract partial class ScriptableRenderer: IDisposable
     {
         ContextContainer m_frameData = new();
         internal ContextContainer frameData => m_frameData;
+        
+        internal static ScriptableRenderer current = null;
         
         public ScriptableRenderer(ScriptableRendererData rendererData)
         {

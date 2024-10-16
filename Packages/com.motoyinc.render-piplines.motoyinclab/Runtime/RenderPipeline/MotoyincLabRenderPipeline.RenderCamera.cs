@@ -50,7 +50,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             var frameData = GetRenderer(camera, additionalCameraData).frameData;
             var cameraData = CreateCameraData(frameData, camera, additionalCameraData, true);
             
-            // 数据创建于处理
+            // 数据创建与处理
+            InitializeAdditionalCameraData(camera, additionalCameraData, true, cameraData);
             // ...
             
             // 进入渲染摄像机
@@ -90,6 +91,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 创建和获取数据
             var frameData = GetRenderer(baseCamera, baseAdditionalCameraData).frameData;
             var cameraData = CreateCameraData(frameData, baseCamera, baseAdditionalCameraData, true);
+            InitializeAdditionalCameraData(baseCamera, baseAdditionalCameraData, true, cameraData);
             
             // 进入渲染摄像机
             RenderSingleCamera(context, cameraData);
