@@ -35,24 +35,14 @@ namespace UnityEngine.Rendering.MotoyincLab
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             
-            camera.TryGetCullingParameters(out var cullingParameters);
-            var cullingResults = context.Cull(ref cullingParameters);
-            context.SetupCameraProperties(camera);
-            ShaderTagId shaderTagId = new ShaderTagId("ExampleLightModeTag");
-            var sortingSettings = new SortingSettings(camera);
-            DrawingSettings drawingSettings = new DrawingSettings(shaderTagId, sortingSettings);
-            FilteringSettings filteringSettings = FilteringSettings.defaultValue;
-            context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
-            if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)
-            {
-                context.DrawSkybox(camera);
-            }
+            // 渲染器
+            renderer.Setup(context, ref legacyRenderingData);
+            renderer.Execute(context, ref legacyRenderingData);
             
             context.ExecuteCommandBuffer(cmd); 
             CommandBufferPool.Release(cmd);
             
             context.Submit();
-            
             
             ScriptableRenderer.current = null;
         }
