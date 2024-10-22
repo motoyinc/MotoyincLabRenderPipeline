@@ -28,7 +28,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             using (new ProfilingScope(cmdScope, cameraMetadataSampler))
             {
                 // 渲染操作
-                cmd.ClearRenderTarget(true, true, Color.black);
+                // cmd.ClearRenderTarget(true, true, Color.black);
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
                 
