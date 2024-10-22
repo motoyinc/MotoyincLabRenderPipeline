@@ -17,7 +17,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.BeginSample(passName);
             
             // --------------------------Begin----------------------------
-            // 设置RT
+            // 设置RT (一般是放在 RenderSingleCamera里做)
             context.SetupCameraProperties(camera);
             var depthflage = false;
             var colorflage = false;
@@ -34,14 +34,14 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.Clear();
             
             
-            
             // ----------Begin：UI编辑器---------
+#if UNITY_EDITOR 
             PrepareForSceneWindow();
+#endif
             // ----------END---------
             
             
-            
-            // 设置Cull()
+            // 设置Cull() (根据需求，每个Pass自己做处理)
             if (!camera.TryGetCullingParameters(out ScriptableCullingParameters cullingParameters))
             {
                 Debug.LogWarning($"<b>{camera.name}: <\b>无法从相机获取剪裁数据，<b>{passName}: <\b>当前Pass将终止渲染"  );
