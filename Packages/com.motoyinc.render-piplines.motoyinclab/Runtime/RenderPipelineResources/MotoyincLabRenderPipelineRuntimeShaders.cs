@@ -11,24 +11,14 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         // 管线Shader资源
         bool IRenderPipelineGraphicsSettings.isAvailableInPlayerBuild => true;
-        [SerializeField]
-        // [ResourcePath("Shaders/Utils/CoreBlit.shader")]
-        internal Shader m_CoreBlitPS;
         
-        public Shader coreBlitPS
+        [SerializeField, ResourcePath("Shaders/Utils/FallbackError.shader")]
+        Shader m_FallbackErrorShader;
+        public Shader fallbackErrorShader
         {
-            get => m_CoreBlitPS;
-            set => this.SetValueAndNotify(ref m_CoreBlitPS, value, nameof(m_CoreBlitPS));
+            get => m_FallbackErrorShader;
+            set => this.SetValueAndNotify(ref m_FallbackErrorShader, value, nameof(m_FallbackErrorShader));
         }
-
-        [SerializeField]
-        // [ResourcePath("Shaders/Utils/CoreBlitColorAndDepth.shader")]
-        internal Shader m_CoreBlitColorAndDepthPS;
         
-        public Shader coreBlitColorAndDepthPS
-        {
-            get => m_CoreBlitColorAndDepthPS;
-            set => this.SetValueAndNotify(ref m_CoreBlitColorAndDepthPS, value, nameof(m_CoreBlitColorAndDepthPS));
-        }
     }
 }
