@@ -3,6 +3,7 @@
     public class MotoyincLabRenderingData : ContextItem
     {
         internal CommandBuffer m_CommandBuffer;
+        public CullingResults cullResults;
 
         internal CommandBuffer commandBuffer
         {
@@ -15,7 +16,8 @@
         }
         public override void Reset()
         {
-            m_CommandBuffer = null;
+            m_CommandBuffer = default;
+            cullResults = default;
         }
     }
 }

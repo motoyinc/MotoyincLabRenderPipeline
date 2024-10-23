@@ -8,9 +8,12 @@ namespace UnityEngine.Rendering.MotoyincLab
         public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            var data = renderingData.frameData.Get<MotoyincLabRenderingData>();
+            cullingResults = data.cullResults;
             camera = cameraData.camera;
             cmd = renderingData.commandBuffer;
             passName = "SimpleRenderPass";
+            
         }
         
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -19,38 +22,49 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             // --------------------------Begin----------------------------
             // 设置摄像机属性
-            context.SetupCameraProperties(camera);
+            //【本段代码已迁移至 Renderer.Execute() 中】
+            //
+            // context.SetupCameraProperties(camera);
+            // context.ExecuteCommandBuffer(cmd);
+            // cmd.Clear();
             
             // 设置RT (一般是放在 RenderSingleCamera里做)
-            var depthflage = false;
-            var colorflage = false;
-            var colorFlags = Color.clear;
-            if (camera.clearFlags <= CameraClearFlags.Depth)
-                depthflage = true;
-            if (camera.clearFlags == CameraClearFlags.Color || camera.clearFlags == CameraClearFlags.SolidColor)
-            {
-                colorflage = true;
-                colorFlags = camera.backgroundColor.linear;
-            }
-            cmd.ClearRenderTarget(depthflage, colorflage, colorFlags);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
+            //【本段代码已迁移至 RenderPipeline.RenderSingleCamera() 中】
+            //
+            // var depthflage = false;
+            // var colorflage = false;
+            // var colorFlags = Color.clear;
+            // if (camera.clearFlags <= CameraClearFlags.Depth)
+            //     depthflage = true;
+            // if (camera.clearFlags == CameraClearFlags.Color || camera.clearFlags == CameraClearFlags.SolidColor)
+            // {
+            //     colorflage = true;
+            //     colorFlags = camera.backgroundColor.linear;
+            // }
+            // cmd.ClearRenderTarget(depthflage, colorflage, colorFlags);
+            // context.ExecuteCommandBuffer(cmd);
+            // cmd.Clear();
             
             
             // ----------Begin：UI编辑器---------
-#if UNITY_EDITOR 
-            PrepareForSceneWindow();
-#endif
+            //【本段代码已迁移至 RenderPipeline.RenderSingleCamera() 中】
+            //
+// #if UNITY_EDITOR 
+//             PrepareForSceneWindow();
+// #endif
             // ----------END---------
             
             
-            // 设置Cull() (根据需求，每个Pass自己做处理)
-            if (!camera.TryGetCullingParameters(out ScriptableCullingParameters cullingParameters))
-            {
-                Debug.LogWarning($"<b>{camera.name}: <\b>无法从相机获取剪裁数据，<b>{passName}: <\b>当前Pass将终止渲染"  );
-                return;
-            }
-            var cullingResults = context.Cull(ref cullingParameters);
+            // 摄像机剔除设置
+            //【本段代码已迁移至 RenderPipeline.RenderSingleCamera() 中】
+            //
+            // if (!camera.TryGetCullingParameters(out ScriptableCullingParameters cullingParameters))
+            // {
+            //     Debug.LogWarning($"<b>{camera.name}: <\b>无法从相机获取剪裁数据，<b>{passName}: <\b>当前Pass将终止渲染"  );
+            //     return;
+            // }
+            // var cullingResults = context.Cull(ref cullingParameters);
+            
             
             
             
@@ -98,7 +112,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             // ----------Begin：编辑器内渲染---------
 #if UNITY_EDITOR 
             DrawUnsupportedShaders(context,cullingResults);
-            DrawGizmos(context);
+            
+            //【本段代码已迁移至 Renderer.Execute() 中】
+            //
+            // DrawGizmos(context);
 #endif
             // ----------END---------
             
@@ -150,23 +167,27 @@ namespace UnityEngine.Rendering.MotoyincLab
         }
         
         // 渲染编辑器内UI
-        void DrawGizmos (ScriptableRenderContext context) 
-        {
-            if (Handles.ShouldRenderGizmos()) 
-            {
-                context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
-                context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
-            }
-        }
+        //【本段代码已迁移至 Renderer.Execute() 中】
+        //
+        // void DrawGizmos (ScriptableRenderContext context) 
+        // {
+        //     if (Handles.ShouldRenderGizmos()) 
+        //     {
+        //         context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
+        //         context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
+        //     }
+        // }
         
         // 渲染UI编辑器UI
-        void PrepareForSceneWindow () 
-        {
-            if (camera.cameraType == CameraType.SceneView) 
-            {
-                ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
-            }
-        }
+        //【本段代码已迁移至 RenderPipeline.RenderSingleCamera() 中】
+        //
+        // void PrepareForSceneWindow () 
+        // {
+        //     if (camera.cameraType == CameraType.SceneView) 
+        //     {
+        //         ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
+        //     }
+        // }
 #endif
 
     }

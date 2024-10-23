@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering;
+using UnityEditor;
+
 namespace UnityEngine.Rendering.MotoyincLab
 {
     public abstract partial class ScriptableRenderer
@@ -44,24 +44,24 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             var cameraData =renderingData.frameData.Get<MotoyincLabCameraData>();
             Camera camera = cameraData.camera;
+            var cmd = renderingData.commandBuffer;
             
-            ExecuteRenderPass(context, ref renderingData);
+            // 设置摄像机属性
+            context.SetupCameraProperties(camera);
+            context.ExecuteCommandBuffer(cmd);
+            cmd.Clear();
             
-            // camera.TryGetCullingParameters(out var cullingParameters);
-            // var cullingResults = context.Cull(ref cullingParameters);
-            // context.SetupCameraProperties(camera);
-            // ShaderTagId shaderTagId = new ShaderTagId("Unlit");
-            // var sortingSettings = new SortingSettings(camera);
-            // DrawingSettings drawingSettings = new DrawingSettings(shaderTagId, sortingSettings);
-            // FilteringSettings filteringSettings = FilteringSettings.defaultValue;
-            // context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
-            // if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)
-            // {
-            //     context.DrawSkybox(camera);
-            // }
+            // 执行Pass列表
+            ExecuteRenderPassList(context, ref renderingData);
+            
+#if UNITY_EDITOR
+            // 渲染Gizmos
+            if (cameraData.isSceneViewCamera)
+                DrawGizmos(context,camera);
+#endif
         }
         
-        void ExecuteRenderPass(ScriptableRenderContext context, ref RenderingData renderingData)
+        void ExecuteRenderPassList(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             if (renderPassList.Count != 0)
             {
@@ -74,5 +74,15 @@ namespace UnityEngine.Rendering.MotoyincLab
                 }
             }
         }
+#if UNITY_EDITOR     
+        void DrawGizmos (ScriptableRenderContext context,Camera camera) 
+        {
+            if (Handles.ShouldRenderGizmos()) 
+            {
+                context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
+                context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
+            }
+        }
+#endif
     }
 }
