@@ -23,9 +23,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 for (int i = 0; i < renderPassList.Count; ++i)
                 {
                     if (renderPassList[i] != null)
-                    {
                         renderPassList[i].Setup(context, ref renderingData);
-                    }
                 }
             }
         }

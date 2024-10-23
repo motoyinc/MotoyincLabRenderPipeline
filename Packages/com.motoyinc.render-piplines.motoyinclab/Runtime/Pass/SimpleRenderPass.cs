@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine.Rendering.RendererUtils;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
@@ -17,8 +18,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.BeginSample(passName);
             
             // --------------------------Begin----------------------------
-            // 设置RT (一般是放在 RenderSingleCamera里做)
+            // 设置摄像机属性
             context.SetupCameraProperties(camera);
+            
+            // 设置RT (一般是放在 RenderSingleCamera里做)
             var depthflage = false;
             var colorflage = false;
             var colorFlags = Color.clear;
@@ -52,37 +55,43 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             
             // ----------Begin：不透明---------
-            // 渲染顺序
-            var sortingSettings = new SortingSettings(camera) { criteria = SortingCriteria.CommonOpaque };
-            // 渲染排序
-            FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
-            
-            // 设置支持的 LightMode Shader PassTag
             ShaderTagId shaderTagId = new ShaderTagId("Unlit");
-            DrawingSettings drawingSettings = new DrawingSettings(shaderTagId, sortingSettings);
             
-            // 绘制命令
-            context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
-            // ----------END---------
-            
-            
-            
-            // ----------Begin：渲染内置天空球---------
-            if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)
+            // 创建 RendererListDesc
+            RendererListDesc rendererListDesc = new RendererListDesc(shaderTagId, cullingResults, camera)
             {
-                context.DrawSkybox(camera);
-            }
+                sortingCriteria = SortingCriteria.CommonOpaque, // 渲染顺序
+                rendererConfiguration = PerObjectData.None,     // 附加数据（探针、光照贴图等）
+                renderQueueRange = RenderQueueRange.opaque      // 过滤设置
+            };
+            RendererList rendererList = context.CreateRendererList(rendererListDesc);
+            // 绘制命令
+            cmd.DrawRendererList(rendererList);
             // ----------END---------
             
             
             
-            // ----------Begin：渲染半透明---------
-            sortingSettings.criteria = SortingCriteria.CommonTransparent;
-            drawingSettings.sortingSettings = sortingSettings;
-            filteringSettings.renderQueueRange = RenderQueueRange.transparent;
-            
-            context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
-            // ----------END---------
+             // ----------Begin：渲染内置天空球---------
+             context.ExecuteCommandBuffer(cmd);
+             cmd.Clear();
+             if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)
+             {
+                 context.DrawSkybox(camera);
+             }
+             // ----------END---------
+             
+             
+             
+             // ----------Begin：渲染半透明---------
+             rendererListDesc = new RendererListDesc(shaderTagId, cullingResults, camera)
+             {
+                 sortingCriteria = SortingCriteria.CommonTransparent,
+                 rendererConfiguration = PerObjectData.None,
+                 renderQueueRange = RenderQueueRange.transparent
+             };
+             rendererList = context.CreateRendererList(rendererListDesc);
+             cmd.DrawRendererList(rendererList);
+             // ----------END---------
             
             
             
@@ -117,20 +126,27 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 渲染不受支持材质球
         void DrawUnsupportedShaders(ScriptableRenderContext context, CullingResults cullingResults)
         {
-            // 不受支持 LightMode Shader PassTag
-            var drawingSettings = new DrawingSettings(legacyShaderTagIds[0], new SortingSettings(camera));
-            for (int i = 1; i < legacyShaderTagIds.Length; i++) 
-                drawingSettings.SetShaderPassName(i, legacyShaderTagIds[i]);
-            
+            // 渲染顺序
+            var sortingSettings = new SortingSettings(camera);
+    
             // 创建错误材质球
+            var fallbackErrorShader = GraphicsSettings.GetRenderPipelineSettings<MotoyincLabRenderPipelineRuntimeShaders>().fallbackErrorShader;
             if (errorMaterial == null) 
-                errorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"));
-            
-            drawingSettings.overrideMaterial = errorMaterial;
-            // 剪裁设置
-            var filteringSettings = FilteringSettings.defaultValue;
-                
-            context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
+                errorMaterial = new Material(fallbackErrorShader);
+
+            // 创建 RendererListDesc 描述
+            var rendererListDesc = new RendererListDesc(legacyShaderTagIds, cullingResults, camera)
+            {
+                sortingCriteria = sortingSettings.criteria,
+                rendererConfiguration = PerObjectData.None,
+                renderQueueRange = RenderQueueRange.all,
+                overrideMaterial = errorMaterial
+            };
+            var rendererList = context.CreateRendererList(rendererListDesc);
+            if (rendererList.isValid)
+            {
+                cmd.DrawRendererList(rendererList);
+            }
         }
         
         // 渲染编辑器内UI
