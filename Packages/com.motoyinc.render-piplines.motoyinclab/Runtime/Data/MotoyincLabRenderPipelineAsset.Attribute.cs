@@ -14,6 +14,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         // Advanced settings
         [SerializeField] bool m_UseSRPBatcher = true;
+        [SerializeField] bool m_SupportsDynamicBatching = false;
 
         public bool supportsHDR
         {
@@ -25,6 +26,12 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             get => m_UseSRPBatcher;
             set => m_UseSRPBatcher = value;
+        }
+        
+        public bool supportsDynamicBatching
+        {
+            get => m_SupportsDynamicBatching;
+            set => m_SupportsDynamicBatching = value;
         }
 
         public ReadOnlySpan<ScriptableRenderer> renderers => m_Renderers;
