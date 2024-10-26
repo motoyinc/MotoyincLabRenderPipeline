@@ -80,7 +80,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             return cameraData.camera.TryGetCullingParameters(false, out cullingParams);
         }
 
-        // 该方法是
+        // 该方法是Catlikecoding版本的ClearRenderTarget方法
         static void Catlikecoding_ClearRenderTarget(ScriptableRenderContext context ,CommandBuffer cmd, Camera camera)
         {
             context.SetupCameraProperties(camera);

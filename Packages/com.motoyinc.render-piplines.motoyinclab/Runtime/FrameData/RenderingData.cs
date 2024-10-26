@@ -31,6 +31,8 @@
             }
         }
         
+        public ref bool supportsDynamicBatching => ref frameData.Get<MotoyincLabRenderingData>().supportsDynamicBatching;
+        
     }
     
     public struct CameraData

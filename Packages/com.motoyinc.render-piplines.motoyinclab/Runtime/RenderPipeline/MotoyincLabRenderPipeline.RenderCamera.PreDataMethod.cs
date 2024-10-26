@@ -56,7 +56,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             MotoyincLabRenderPipelineAsset settings, CommandBuffer cmd, bool isForwardPlus, ScriptableRenderer renderer)
         {
             MotoyincLabRenderingData data = frameData.Get<MotoyincLabRenderingData>();
-            
+            data.supportsDynamicBatching = settings.supportsDynamicBatching;
             data.m_CommandBuffer = cmd;
             
             return data;

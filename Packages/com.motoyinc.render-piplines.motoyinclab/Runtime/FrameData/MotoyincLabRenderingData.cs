@@ -4,6 +4,7 @@
     {
         internal CommandBuffer m_CommandBuffer;
         public CullingResults cullResults;
+        public bool supportsDynamicBatching;
 
         internal CommandBuffer commandBuffer
         {
@@ -18,6 +19,7 @@
         {
             m_CommandBuffer = default;
             cullResults = default;
+            supportsDynamicBatching = default;
         }
     }
 }
