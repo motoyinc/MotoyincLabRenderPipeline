@@ -12,6 +12,7 @@
 
 #include "UnityInput.hlsl"
 
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 // 坐标空间转换
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
 // float3 TransformObjectToWorld (float3 positionOS) {
