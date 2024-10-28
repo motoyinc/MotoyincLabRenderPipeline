@@ -21,13 +21,13 @@
   "samples": [
     {
       "displayName": "MTRPLab Package Samples",
-      "description": "Collection of scenes showcasing different features of the Motoyinc Lab Render Pipeline.",
+      "description": "本管线的渲染示范。",
       "path": "Samples~/MTRPLabPackageSamples"
     },
     {
-      "displayName": "MTRPLab RenderGraph Samples",
-      "description": "Collection of scripts with some examples of RenderGraph and how it is used within the Motoyinc Lab Render Pipeline.",
-      "path": "Samples~/MTRPLabRenderGraphSamples"
+      "displayName": "GPU Instion Demo",
+      "description": "GPU实例化的相关演示Shader与相关脚本。 ",
+      "path": "Samples~/GPU_Instion_Demo"
     }
   ]
 }
