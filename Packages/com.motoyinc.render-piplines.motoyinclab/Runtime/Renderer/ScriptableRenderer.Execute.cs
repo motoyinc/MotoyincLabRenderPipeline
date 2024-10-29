@@ -39,12 +39,17 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         
         public abstract void Setup(ScriptableRenderContext context, ref RenderingData renderingData);
+        
+        public virtual void SetupLights(ScriptableRenderContext context, ref RenderingData renderingData) { }
 
         public void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var cameraData =renderingData.frameData.Get<MotoyincLabCameraData>();
             Camera camera = cameraData.camera;
             var cmd = renderingData.commandBuffer;
+            
+            // 设置灯光
+            SetupLights(context, ref renderingData);
             
             // 设置摄像机属性
             context.SetupCameraProperties(camera);

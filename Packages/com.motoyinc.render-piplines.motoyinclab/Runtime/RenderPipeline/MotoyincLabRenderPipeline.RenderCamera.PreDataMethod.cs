@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Unity.Collections;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
@@ -60,6 +60,12 @@ namespace UnityEngine.Rendering.MotoyincLab
             data.m_CommandBuffer = cmd;
             
             return data;
+        }
+
+        static MotoyincLabLightData CreateLightData(ContextContainer frameData, MotoyincLabRenderPipelineAsset settings, NativeArray<VisibleLight> visibleLights)
+        {
+            MotoyincLabLightData lightData = frameData.Create<MotoyincLabLightData>();
+            return lightData;
         }
         
     }

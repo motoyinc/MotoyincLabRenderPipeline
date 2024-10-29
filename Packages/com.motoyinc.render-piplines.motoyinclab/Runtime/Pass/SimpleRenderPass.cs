@@ -69,7 +69,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             
             // ----------Begin：不透明---------
-            ShaderTagId shaderTagId = new ShaderTagId("Unlit");
+            ShaderTagId[] shaderTagId = {
+                new ShaderTagId("Unlit"),
+                new ShaderTagId("Lit"),
+            };
             
             // 创建 RendererListDesc
             RendererListDesc rendererListDesc = new RendererListDesc(shaderTagId, cullingResults, camera)

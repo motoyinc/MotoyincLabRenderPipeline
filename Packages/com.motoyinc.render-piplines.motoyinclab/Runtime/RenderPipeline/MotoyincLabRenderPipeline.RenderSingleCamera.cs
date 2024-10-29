@@ -50,6 +50,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 using (new ProfilingScope(Profiling.Pipeline.initializeRenderingData))
                 {
                     CreateRenderingData(frameData, asset, cmd, false, cameraData.renderer);
+                    CreateLightData(frameData, asset, data.cullResults.visibleLights);
                 }
                 RenderingData legacyRenderingData = new RenderingData(frameData);
             
