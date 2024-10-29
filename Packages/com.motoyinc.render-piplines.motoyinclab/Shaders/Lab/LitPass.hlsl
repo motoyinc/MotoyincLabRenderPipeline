@@ -57,6 +57,9 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
     #endif
 
+    #if defined(_GLOBAL_DEBUG)
+    return DebugSurface(surface);
+    #endif
 
     // 输出颜色
     return float4(color,surface.alpha);

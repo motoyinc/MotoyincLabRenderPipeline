@@ -21,6 +21,7 @@
             HLSLPROGRAM
             #pragma multi_compile_instancing
             #pragma shader_feature _CLIPPING
+            #pragma shader_feature _GLOBAL_DEBUG
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
             

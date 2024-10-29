@@ -58,6 +58,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             MotoyincLabRenderingData data = frameData.Get<MotoyincLabRenderingData>();
             data.supportsDynamicBatching = settings.supportsDynamicBatching;
             data.m_CommandBuffer = cmd;
+#if UNITY_EDITOR
+            data.globalDebugMode = settings.globalDebugMode;
+#endif
             
             return data;
         }

@@ -5,6 +5,10 @@
         internal CommandBuffer m_CommandBuffer;
         public CullingResults cullResults;
         public bool supportsDynamicBatching;
+#if UNITY_EDITOR
+        public GlobalDebugMode globalDebugMode;
+#endif
+        
 
         internal CommandBuffer commandBuffer
         {
@@ -20,6 +24,9 @@
             m_CommandBuffer = default;
             cullResults = default;
             supportsDynamicBatching = default;
+#if UNITY_EDITOR
+            globalDebugMode = GlobalDebugMode.Off;
+#endif
         }
     }
 }
