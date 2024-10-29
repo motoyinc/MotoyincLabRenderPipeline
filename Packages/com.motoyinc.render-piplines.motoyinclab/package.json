@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "unity": "6000.0",
   "author": {"email": "motoyinc@gmail.com","name": "motoyinc","url": "https://github.com/Motoyinc"},
-  "displayName": "Motoyinc RP Lab",
+  "displayName": "Motoyinc Lab RP",
   "dependencies": {
     "com.unity.render-pipelines.core": "17.0.3",
     "com.unity.shadergraph": "17.0.3",
