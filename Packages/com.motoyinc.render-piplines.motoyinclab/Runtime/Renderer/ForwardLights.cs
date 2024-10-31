@@ -25,7 +25,9 @@
 
         internal void SetupLights(UnsafeCommandBuffer cmd, MotoyincLabRenderingData renderingData, MotoyincLabCameraData cameraData, MotoyincLabLightData lightData)
         {
-            Light light = RenderSettings.sun;
+            var visibleLights =lightData.visibleLights.UnsafeElementAtMutable(lightData.mainLightIndex);
+            Light light = visibleLights.light;
+            // Light light = RenderSettings.sun;
             var lightPos = -light.transform.forward;
             var lightColor = light.color.linear  * light.intensity;
             cmd.SetGlobalVector(LightConstantBuffer._MainLightPosition, lightPos);
