@@ -1,4 +1,6 @@
-﻿namespace UnityEngine.Rendering.MotoyincLab
+﻿using Unity.Collections;
+
+namespace UnityEngine.Rendering.MotoyincLab
 {
     public class ForwardLights
     {
@@ -52,11 +54,12 @@
         // 向GPU发送主光源信息
         void SetupMainLightConstants(UnsafeCommandBuffer cmd, MotoyincLabLightData lightData)
         {
-            var visibleLights =lightData.visibleLights.UnsafeElementAtMutable(lightData.mainLightIndex);
-            Light light = visibleLights.light;
-            // Light light = RenderSettings.sun;
-            var lightPos = -light.transform.forward;
-            var lightColor = light.color.linear  * light.intensity;
+            // 获取灯光信息
+            InitializeLightConstants(lightData.visibleLights, lightData.mainLightIndex,
+                out var lightPos,
+                out var lightColor);
+            
+            // 向GPU发送灯光信息
             cmd.SetGlobalVector(LightConstantBuffer._MainLightPosition, lightPos);
             cmd.SetGlobalVector(LightConstantBuffer._MainLightColor, lightColor);
         }
@@ -73,10 +76,9 @@
                     
                     if (i != lightData.mainLightIndex)
                     {
-                        var visibleLights =lightData.visibleLights.UnsafeElementAtMutable(i);
-                        Light light = visibleLights.light;
-                        m_AdditionalLightColors[lightIter] = light.color.linear * light.intensity;
-                        m_AdditionalLightPositions[lightIter] = -light.transform.forward;
+                        InitializeLightConstants(lightData.visibleLights, i,
+                            out m_AdditionalLightPositions[lightIter],
+                            out m_AdditionalLightColors[lightIter]);
                         
                         lightIter++;
                         lightCount = lightIter;
@@ -92,6 +94,17 @@
                 cmd.SetGlobalVector(LightConstantBuffer._AdditionalLightsCount, Vector4.zero);
             }
 
+        }
+
+        // 根据引索 获取VisibleLight里的单个灯光信息
+        void InitializeLightConstants(NativeArray<VisibleLight> lights, int lightIndex, 
+            out Vector4 lightPos,
+            out Vector4 lightColor)
+        {
+            var visibleLights = lights.UnsafeElementAtMutable(lightIndex);
+            Light light = visibleLights.light;
+            lightColor = light.color.linear * light.intensity;
+            lightPos = -light.transform.forward;
         }
         
         internal void Cleanup()
