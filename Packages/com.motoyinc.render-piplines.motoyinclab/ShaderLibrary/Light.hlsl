@@ -21,10 +21,11 @@ int GetAdditionalLightCount () {
     return _AdditionalLightsCount.x;
 }
 
-Light GetAdditionalLight (int index) {
+Light GetAdditionalLight (int index, float3 positionWS) {
     Light light;
     light.color = _AdditionalLightsColor[index].rgb;
-    light.direction = _AdditionalLightsPosition[index].xyz;
+    float4 lightPositionWS = _AdditionalLightsPosition[index];
+    light.direction = lightPositionWS.xyz - positionWS * lightPositionWS.w;
     return light;
 }
 

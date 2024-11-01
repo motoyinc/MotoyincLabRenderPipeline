@@ -6,6 +6,8 @@ namespace UnityEngine.Rendering.MotoyincLab
     {
         Vector4[] m_AdditionalLightPositions;
         Vector4[] m_AdditionalLightColors;
+        Vector4[] m_AdditionalLightAttenuations;
+        Vector4[] m_AdditionalLightSpotDirections;
         private int m_maxLights;
         
         static class LightConstantBuffer
@@ -16,6 +18,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             public static int _AdditionalLightsPosition;
             public static int _AdditionalLightsColor;
             public static int _AdditionalLightsCount;
+            
+            public static int _AdditionalLightsAttenuation;
+            public static int _AdditionalLightsSpotDir;
         }
         
         internal ForwardLights()
@@ -26,10 +31,14 @@ namespace UnityEngine.Rendering.MotoyincLab
             LightConstantBuffer._AdditionalLightsPosition = Shader.PropertyToID("_AdditionalLightsPosition");
             LightConstantBuffer._AdditionalLightsColor = Shader.PropertyToID("_AdditionalLightsColor");
             LightConstantBuffer._AdditionalLightsCount = Shader.PropertyToID("_AdditionalLightsCount");
+            LightConstantBuffer._AdditionalLightsAttenuation = Shader.PropertyToID("_AdditionalLightsAttenuation");
+            LightConstantBuffer._AdditionalLightsSpotDir = Shader.PropertyToID("_AdditionalLightsSpotDir");
 
             m_maxLights = 4;
             m_AdditionalLightPositions = new Vector4[m_maxLights];
             m_AdditionalLightColors = new Vector4[m_maxLights];
+            m_AdditionalLightAttenuations = new Vector4[m_maxLights];
+            m_AdditionalLightSpotDirections = new Vector4[m_maxLights];
         }
         
         public void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -57,7 +66,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 获取灯光信息
             InitializeLightConstants(lightData.visibleLights, lightData.mainLightIndex,
                 out var lightPos,
-                out var lightColor);
+                out var lightColor,
+                out var lightAttenuation,
+                out var lightSpotDir);
             
             // 向GPU发送灯光信息
             cmd.SetGlobalVector(LightConstantBuffer._MainLightPosition, lightPos);
@@ -78,7 +89,9 @@ namespace UnityEngine.Rendering.MotoyincLab
                     {
                         InitializeLightConstants(lightData.visibleLights, i,
                             out m_AdditionalLightPositions[lightIter],
-                            out m_AdditionalLightColors[lightIter]);
+                            out m_AdditionalLightColors[lightIter],
+                            out m_AdditionalLightAttenuations[lightIter],
+                            out m_AdditionalLightSpotDirections[lightIter]);
                         
                         lightIter++;
                         lightCount = lightIter;
@@ -86,6 +99,8 @@ namespace UnityEngine.Rendering.MotoyincLab
                     
                     cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsPosition, m_AdditionalLightPositions);
                     cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsColor, m_AdditionalLightColors);
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsAttenuation, m_AdditionalLightAttenuations);
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsSpotDir, m_AdditionalLightSpotDirections);
                 }
                 cmd.SetGlobalVector(LightConstantBuffer._AdditionalLightsCount, new Vector4(lightCount, 0.0f, 0.0f, 0.0f));
             }
@@ -100,14 +115,21 @@ namespace UnityEngine.Rendering.MotoyincLab
         static Vector4 k_DefaultLightPosition = new Vector4(0.0f, 0.0f, 1.0f, 0.0f);
         static Vector4 k_DefaultLightColor = Color.black;
         
+        static Vector4 k_DefaultLightAttenuation = new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+        static Vector4 k_DefaultLightSpotDirection = new Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+        
         // 根据引索 获取VisibleLight里的单个灯光数据
         void InitializeLightConstants(NativeArray<VisibleLight> lights, int lightIndex, 
             out Vector4 lightPos,
-            out Vector4 lightColor)
+            out Vector4 lightColor, 
+            out Vector4 lightAttenuation, 
+            out Vector4 lightSpotDir)
         {
             // 初始化默认灯光参数
             lightPos = k_DefaultLightPosition;
             lightColor = k_DefaultLightColor;
+            lightAttenuation = k_DefaultLightAttenuation;
+            lightSpotDir = k_DefaultLightSpotDirection;
             
             // 当引索小于0时 直接退出（主光源不存在时）
             if(lightIndex < 0)
@@ -117,7 +139,21 @@ namespace UnityEngine.Rendering.MotoyincLab
             var visibleLights = lights.UnsafeElementAtMutable(lightIndex);
             Light light = visibleLights.light;
             lightColor = light.color.linear * light.intensity;
-            lightPos = -light.transform.forward;
+            
+            // 区分直射光和非直射光（用w分量区分, 0为直射光\1为非直射光）
+            if (visibleLights.lightType == LightType.Directional)
+            {
+                var dir = -light.transform.forward;
+                lightPos = new Vector4(dir.x, dir.y, dir.z, 0.0f);
+            }
+            else
+            {
+                // 获取点光源坐标
+                var lightLocalToWorld = visibleLights.localToWorldMatrix;
+                Vector4 pos = lightLocalToWorld.GetColumn(3);
+
+                lightPos = new Vector4(pos.x, pos.y, pos.z, 1.0f);
+            }
         }
         
         internal void Cleanup()

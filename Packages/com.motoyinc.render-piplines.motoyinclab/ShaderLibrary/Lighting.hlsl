@@ -19,7 +19,7 @@ float3 GetLighting(SurfaceData surface, Light light)
     return IncomingLight(surface, light) * surface.color;
 }
 
-float3 GetLighting (SurfaceData surface) {
+float3 GetLighting (SurfaceData surface, float3 positionWS) {
     float3 color = 0.0;
     // 计算直射光
     color = GetLighting(surface, GetDirectionalLight());
@@ -27,7 +27,7 @@ float3 GetLighting (SurfaceData surface) {
     // 累计计算附加光
     for(int i = 0 ; i< GetAdditionalLightCount(); ++i)
     {
-        color += GetLighting(surface, GetAdditionalLight(i));
+        color += GetLighting(surface, GetAdditionalLight(i, positionWS));
     }
 
     // 输出灯光
