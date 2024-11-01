@@ -96,11 +96,24 @@ namespace UnityEngine.Rendering.MotoyincLab
 
         }
 
-        // 根据引索 获取VisibleLight里的单个灯光信息
+        //默认灯光数据
+        static Vector4 k_DefaultLightPosition = new Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+        static Vector4 k_DefaultLightColor = Color.black;
+        
+        // 根据引索 获取VisibleLight里的单个灯光数据
         void InitializeLightConstants(NativeArray<VisibleLight> lights, int lightIndex, 
             out Vector4 lightPos,
             out Vector4 lightColor)
         {
+            // 初始化默认灯光参数
+            lightPos = k_DefaultLightPosition;
+            lightColor = k_DefaultLightColor;
+            
+            // 当引索小于0时 直接退出（主光源不存在时）
+            if(lightIndex < 0)
+                return;
+            
+            // 获取灯光参数
             var visibleLights = lights.UnsafeElementAtMutable(lightIndex);
             Light light = visibleLights.light;
             lightColor = light.color.linear * light.intensity;
