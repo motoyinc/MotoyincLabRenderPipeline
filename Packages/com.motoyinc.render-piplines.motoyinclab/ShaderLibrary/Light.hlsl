@@ -2,10 +2,14 @@
 #define MLABRP_LIGHT_INCLUDED
 
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Common.hlsl"
+#define MAX_ADDITIONAL_LIGHT_COUNT 4
 
 CBUFFER_START(_CustomLight)
-    float3 _MainLightColor;
-    float3 _MainLightPosition;
+    float4 _MainLightColor;
+    float4 _MainLightPosition;
+    float4 _AdditionalLightsCount;
+    float4 _AdditionalLightsPosition[MAX_ADDITIONAL_LIGHT_COUNT];
+    float4 _AdditionalLightsColor[MAX_ADDITIONAL_LIGHT_COUNT];
 CBUFFER_END
 
 struct Light {
@@ -13,10 +17,21 @@ struct Light {
     float3 direction;
 };
 
+int GetAdditionalLightCount () {
+    return _AdditionalLightsCount.x;
+}
+
+Light GetAdditionalLight (int index) {
+    Light light;
+    light.color = _AdditionalLightsColor[index].rgb;
+    light.direction = _AdditionalLightsPosition[index].xyz;
+    return light;
+}
+
 Light GetDirectionalLight () {
     Light light;
-    light.color = _MainLightColor;
-    light.direction = _MainLightPosition;
+    light.color = _MainLightColor.rgb;
+    light.direction = _MainLightPosition.xyz;
     return light;
 }
 
