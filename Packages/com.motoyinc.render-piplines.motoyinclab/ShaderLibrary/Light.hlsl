@@ -33,12 +33,13 @@ Light GetAdditionalLight (int index, float3 positionWS) {
 
     // 计算光线衰减
     float distance = length(light.direction);
-    float distanceSqr = distance * distance;    // Distance^2
+    float distanceSqr = max(distance * distance, 0.000001);    // Distance^2
     float3 unDirColor = _AdditionalLightsColor[index].rgb*(1/(distanceSqr)); 
 
     // 光线范围计算
     float lightRangeSqr = _AdditionalLightsAttenuation[index].x; // Range^2
-    float attenuation = max(0,1-(distanceSqr/lightRangeSqr)) * max(0,1-(distanceSqr/lightRangeSqr));
+    float sqr = pow(distanceSqr/lightRangeSqr, 2);
+    float attenuation = saturate(max(0,1-sqr) * max(0,1-sqr));
     unDirColor =unDirColor * attenuation;
 
     // 区分直射光和非直射光Color
