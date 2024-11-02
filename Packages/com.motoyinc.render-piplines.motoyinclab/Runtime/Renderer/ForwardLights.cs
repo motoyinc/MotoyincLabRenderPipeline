@@ -151,8 +151,13 @@ namespace UnityEngine.Rendering.MotoyincLab
                 // 获取点光源坐标
                 var lightLocalToWorld = visibleLights.localToWorldMatrix;
                 Vector4 pos = lightLocalToWorld.GetColumn(3);
-
                 lightPos = new Vector4(pos.x, pos.y, pos.z, 1.0f);
+                
+                // 获取点光源范围的平方 Rnage^2 （用于光线衰减）
+                //      为什么不直接传Range？
+                //      因为我们把部分hlsl的计算移动到了管线内，节省GPU的计算资源
+                //      光线衰减 = max(0, 1- (Distance^2/Rnage^2)^2) 
+                lightAttenuation.x = light.range * light.range;
             }
         }
         

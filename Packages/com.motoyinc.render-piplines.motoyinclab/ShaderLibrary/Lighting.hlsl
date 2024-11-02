@@ -31,7 +31,7 @@ float3 GetLighting (SurfaceData surface, float3 positionWS) {
     }
 
     // 输出灯光
-    color=pow(color,2.2);
+    // color=pow(color,2.2);
     return color;
 }
 
