@@ -24,26 +24,26 @@ int GetAdditionalLightCount () {
 
 Light GetAdditionalLight (int index, float3 positionWS) {
     Light light;
+    float4 lightPositionWS = _AdditionalLightsPosition[index];
+    float3 color = _AdditionalLightsColor[index].rgb;
+    float lightType = lightPositionWS.w;
     
     // 计算光的照射方向
-    float4 lightPositionWS = _AdditionalLightsPosition[index];
-    float lightType = lightPositionWS.w;
     light.direction = lightPositionWS.xyz - positionWS * lightType;
-    float3 dirColor = _AdditionalLightsColor[index].rgb;
 
     // 计算光线衰减
     float distance = length(light.direction);
     float distanceSqr = max(distance * distance, 0.000001);    // Distance^2
-    float3 unDirColor = _AdditionalLightsColor[index].rgb*(1/(distanceSqr)); 
+    float distanceAttenuation = saturate(1/(distanceSqr)); 
 
     // 光线范围计算
     float lightRangeSqr = _AdditionalLightsAttenuation[index].x; // Range^2
     float sqr = pow(distanceSqr/lightRangeSqr, 2);
-    float attenuation = saturate(max(0,1-sqr) * max(0,1-sqr));
-    unDirColor =unDirColor * attenuation;
+    float RangeAttenuation = max(0,1-sqr) * max(0,1-sqr);
+    float Attenuation = RangeAttenuation * distanceAttenuation;
 
     // 区分直射光和非直射光Color
-    light.color = dirColor * (1-lightType) + unDirColor * lightType;
+    light.color = color * (1 - lightType + Attenuation * lightType);
     return light;
 }
 
