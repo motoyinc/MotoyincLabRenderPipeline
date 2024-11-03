@@ -143,7 +143,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 区分直射光和非直射光（用w分量区分, 0为直射光\1为非直射光）
             if (visibleLights.lightType == LightType.Directional)
             {
-                var dir = -light.transform.forward;
+                var dir = -light.transform.forward;     // Vector4 dir = -lightLocalToWorld.GetColumn(2); 是一样的
                 lightPos = new Vector4(dir.x, dir.y, dir.z, 0.0f);
             }
             else
@@ -158,6 +158,30 @@ namespace UnityEngine.Rendering.MotoyincLab
                 //      因为我们把部分hlsl的计算移动到了管线内，节省GPU的计算资源
                 //      光线衰减 = max(0, 1- (Distance^2/Rnage^2)^2) 
                 lightAttenuation.x = light.range * light.range;
+                
+                // 聚光灯
+                if (visibleLights.lightType == LightType.Spot)
+                {
+                    // 获取聚光灯朝向
+                    //      dot（聚光灯朝向，光线方向）
+                    Vector4 dir = lightLocalToWorld.GetColumn(2);
+                    lightSpotDir = new Vector4(-dir.x, -dir.y, -dir.z, 0.0f);
+                    
+                    
+                    // 计算灯光衰减
+                    float spotAngle = visibleLights.spotAngle;
+                    float? innerSpotAngle = light?.innerSpotAngle;
+                    float cosOuter = Mathf.Cos(Mathf.Deg2Rad * 0.5f * spotAngle);
+                    float cosInner;
+                    if (innerSpotAngle.HasValue)
+                        cosInner = Mathf.Cos(Mathf.Deg2Rad * 0.5f * innerSpotAngle.Value);
+                    else
+                        cosInner = 1;
+
+                    float angleScale = 1.0f / Mathf.Max(0.0001f, cosInner - cosOuter);
+                    lightAttenuation.z = angleScale;
+                    lightAttenuation.w = angleScale * -cosOuter;
+                }
             }
         }
         

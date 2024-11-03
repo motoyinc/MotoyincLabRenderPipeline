@@ -11,6 +11,7 @@ CBUFFER_START(_CustomLight)
     float4 _AdditionalLightsPosition[MAX_ADDITIONAL_LIGHT_COUNT];
     float4 _AdditionalLightsColor[MAX_ADDITIONAL_LIGHT_COUNT];
     float4 _AdditionalLightsAttenuation[MAX_ADDITIONAL_LIGHT_COUNT];
+    float4 _AdditionalLightsSpotDir[MAX_ADDITIONAL_LIGHT_COUNT];
 CBUFFER_END
 
 struct Light {
@@ -33,6 +34,7 @@ Light GetAdditionalLight (int index, float3 positionWS) {
 
     // 计算光线衰减
     float distance = length(light.direction);
+    light.direction = normalize(light.direction);
     float distanceSqr = max(distance * distance, 0.000001);    // Distance^2
     float distanceAttenuation = saturate(1/(distanceSqr)); 
 
@@ -42,8 +44,13 @@ Light GetAdditionalLight (int index, float3 positionWS) {
     float RangeAttenuation = max(0,1-sqr) * max(0,1-sqr);
     float Attenuation = RangeAttenuation * distanceAttenuation;
 
+    // 计算聚光灯衰减
+    float3 spotDir = _AdditionalLightsSpotDir[index].xyz;
+    float spotIntensity = dot(light.direction, spotDir);
+    float spotAttenuation = saturate(spotIntensity * _AdditionalLightsAttenuation[index].z + _AdditionalLightsAttenuation[index].w);
+
     // 区分直射光和非直射光Color
-    light.color = color * (1 - lightType + Attenuation * lightType);
+    light.color = color*((1-lightType) +  Attenuation * spotAttenuation* lightType);
     return light;
 }
 
