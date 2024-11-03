@@ -31,6 +31,12 @@
             }
         }
         
+        public ref bool supportsDynamicBatching => ref frameData.Get<MotoyincLabRenderingData>().supportsDynamicBatching;
+
+#if UNITY_EDITOR
+        public ref GlobalDebugMode globalDebugMode => ref frameData.Get<MotoyincLabRenderingData>().globalDebugMode;
+#endif
+
     }
     
     public struct CameraData

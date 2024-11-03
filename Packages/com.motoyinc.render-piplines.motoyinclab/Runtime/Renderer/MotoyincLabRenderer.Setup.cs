@@ -27,6 +27,16 @@ namespace UnityEngine.Rendering.MotoyincLab
                 }
             }
         }
+
+        public override void SetupLights(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            var cmd = CommandBufferHelpers.GetUnsafeCommandBuffer(renderingData.commandBuffer);
+            MotoyincLabCameraData cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            MotoyincLabRenderingData motoyincLabRenderingData = renderingData.frameData.Get<MotoyincLabRenderingData>();
+            MotoyincLabLightData lightData = renderingData.frameData.Get<MotoyincLabLightData>();
+            
+            m_ForwardLights.SetupLights(cmd, motoyincLabRenderingData, cameraData, lightData);
+        }
     }
     
 }

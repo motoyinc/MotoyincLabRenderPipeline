@@ -24,6 +24,9 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             GC.SuppressFinalize(this);
         }
+        protected virtual void Dispose(bool disposing)
+        {
+        }
         
         public virtual int SupportedCameraStackingTypes()
         {

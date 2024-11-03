@@ -50,6 +50,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 using (new ProfilingScope(Profiling.Pipeline.initializeRenderingData))
                 {
                     CreateRenderingData(frameData, asset, cmd, false, cameraData.renderer);
+                    CreateLightData(frameData, asset, data.cullResults.visibleLights);
                 }
                 RenderingData legacyRenderingData = new RenderingData(frameData);
             
@@ -80,7 +81,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             return cameraData.camera.TryGetCullingParameters(false, out cullingParams);
         }
 
-        // 该方法是
+        // 该方法是Catlikecoding版本的ClearRenderTarget方法
         static void Catlikecoding_ClearRenderTarget(ScriptableRenderContext context ,CommandBuffer cmd, Camera camera)
         {
             context.SetupCameraProperties(camera);

@@ -1,7 +1,21 @@
 ﻿using System;
+using UnityEngine.Serialization;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
+    public enum LightRenderingMode
+    {
+        Disabled,
+        PerPixel,
+        PerVertex,
+    }
+    public enum RendererType
+    {
+        Custom,
+        MotoyincLabRenderer,
+        _2DRenderer,
+    }
+    
     public partial class MotoyincLabRenderPipelineAsset
     {
         // Renderer Data 与 Renderer
@@ -14,6 +28,21 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         // Advanced settings
         [SerializeField] bool m_UseSRPBatcher = true;
+        [SerializeField] bool m_SupportsDynamicBatching = false;
+        
+        // Lighting setting
+        [SerializeField] LightRenderingMode m_MainLightRenderingMode = LightRenderingMode.PerPixel;
+
+#if UNITY_EDITOR
+        // Debug mode
+        [SerializeField] private GlobalDebugMode m_GlobalDebugMode = GlobalDebugMode.Off;
+
+        public GlobalDebugMode globalDebugMode
+        {
+            get => m_GlobalDebugMode;
+            set => m_GlobalDebugMode = value;
+        }
+#endif
 
         public bool supportsHDR
         {
@@ -26,7 +55,19 @@ namespace UnityEngine.Rendering.MotoyincLab
             get => m_UseSRPBatcher;
             set => m_UseSRPBatcher = value;
         }
-
+        
+        public bool supportsDynamicBatching
+        {
+            get => m_SupportsDynamicBatching;
+            set => m_SupportsDynamicBatching = value;
+        }
+        
+        public LightRenderingMode mainLightRenderingMode
+        {
+            get => m_MainLightRenderingMode;
+            internal set => m_MainLightRenderingMode = value;
+        }
+        
         public ReadOnlySpan<ScriptableRenderer> renderers => m_Renderers;
         
         // 获取RendererData

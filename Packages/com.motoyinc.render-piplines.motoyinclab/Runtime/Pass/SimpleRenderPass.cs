@@ -65,11 +65,35 @@ namespace UnityEngine.Rendering.MotoyincLab
             // }
             // var cullingResults = context.Cull(ref cullingParameters);
             
-            
-            
+#if UNITY_EDITOR
+            var globalDebug = GlobalKeyword.Create("_GLOBAL_DEBUG");
+            if (renderingData.globalDebugMode != GlobalDebugMode.Off)
+            {
+                cmd.SetKeyword(globalDebug,true);
+                // for(int i = 0; i < globalDebugKeywordList.Length; i++)
+                    // cmd.SetKeyword(globalDebugKeywordList[i],false);
+                if(renderingData.globalDebugMode == GlobalDebugMode.Color)
+                    cmd.SetGlobalInt(Shader.PropertyToID("_debugFlag"), 1);
+                else if(renderingData.globalDebugMode == GlobalDebugMode.Alpha)
+                    cmd.SetGlobalInt(Shader.PropertyToID("_debugFlag"), 2);
+                else if(renderingData.globalDebugMode == GlobalDebugMode.Normal)
+                    cmd.SetGlobalInt(Shader.PropertyToID("_debugFlag"), 3);
+                else if(renderingData.globalDebugMode == GlobalDebugMode.NormalNormalizeCheck)
+                    cmd.SetGlobalInt(Shader.PropertyToID("_debugFlag"), 4);
+                
+            }
+            else
+                cmd.SetKeyword(globalDebug,false);
+            cmd.EndSample(passName);
+            context.ExecuteCommandBuffer(cmd);
+            cmd.Clear();
+#endif
             
             // ----------Begin：不透明---------
-            ShaderTagId shaderTagId = new ShaderTagId("Unlit");
+            ShaderTagId[] shaderTagId = {
+                new ShaderTagId("Unlit"),
+                new ShaderTagId("Lit"),
+            };
             
             // 创建 RendererListDesc
             RendererListDesc rendererListDesc = new RendererListDesc(shaderTagId, cullingResults, camera)

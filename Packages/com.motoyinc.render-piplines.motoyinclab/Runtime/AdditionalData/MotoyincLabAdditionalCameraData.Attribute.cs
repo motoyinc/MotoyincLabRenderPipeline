@@ -48,7 +48,11 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         // 相机
         [NonSerialized] Camera m_Camera;
+#if UNITY_EDITOR
         internal new Camera camera
+#else
+        internal Camera camera
+#endif
         {
             get
             {

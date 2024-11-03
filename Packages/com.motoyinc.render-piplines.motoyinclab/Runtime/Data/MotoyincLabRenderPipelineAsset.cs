@@ -14,12 +14,7 @@ using UnityEngine.Rendering.MotoyincLab;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
-	public enum RendererType
-	{
-		Custom,
-		MotoyincLabRenderer,
-		_2DRenderer,
-	}
+	
 	
 	public partial class MotoyincLabRenderPipelineAsset:RenderPipelineAsset<MotoyincLabRenderPipeline>
 	{
