@@ -7,5 +7,17 @@
 - Unity版本：6000.0.x
 - 关联包体：
   - com.unity.render-pipelines.core  **v17.0.3**
-  - com.unity.shadergraph **v17.0.3**
   - `关联包体在安装MotoyincLabRP时会自动安装`
+
+## 开发日志
+https://zhuanlan.zhihu.com/p/810720751
+ 
+## 安装管线
+将下面这段链接复制到，Unity的 **PackageManager -> install package from git URL** 中
+```URL
+https://github.com/motoyinc/MotoyincRenderPipeline-Lab.git?path=/Packages/com.motoyinc.render-piplines.motoyinclab
+```
+- 将链接复制到**PackageManager -> install package from git URL** 后等待安装完成，有可能会出现网络原因的安装失败，多试几次就行
+![image](https://github.com/user-attachments/assets/070b1156-4c7b-44dc-bbfe-e8a353808ca8)
+![动画](https://github.com/user-attachments/assets/7c865d30-7948-48c0-9f9a-ac3b8a0f5dfe)
+
