@@ -9,6 +9,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         public ScriptableRenderer renderer;
         public Camera camera;
         public CameraType cameraType;
+        public Vector3 worldSpaceCameraPos;
         
         public bool isGameCamera => cameraType == CameraType.Game;
         public bool isSceneViewCamera => cameraType == CameraType.SceneView;
@@ -20,6 +21,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             renderer = null;
             camera = null;
             cameraType = CameraType.Game;
+            worldSpaceCameraPos = default;
         }
     }
 }

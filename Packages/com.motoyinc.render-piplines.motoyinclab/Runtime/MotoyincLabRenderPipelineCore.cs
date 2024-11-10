@@ -18,7 +18,12 @@ namespace UnityEngine.Rendering.MotoyincLab
             return ref UnsafeUtility.ArrayElementAsRef<T>(array.GetUnsafePtr(), index);
         }
     }
-    
+
+    internal static class ShaderPropertyId
+    {
+        public static readonly int worldSpaceCameraPos = Shader.PropertyToID("_WorldSpaceCameraPos");
+    }
+
     internal enum MLRPProfileId
     {
         MotoyincLabRenderTotal,

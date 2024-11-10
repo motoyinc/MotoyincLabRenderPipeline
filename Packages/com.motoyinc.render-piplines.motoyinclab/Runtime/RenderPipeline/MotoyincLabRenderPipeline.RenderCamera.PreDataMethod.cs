@@ -46,6 +46,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             var renderer = GetRenderer(camera, additionalCameraData);
             var settings = asset;
+            cameraData.worldSpaceCameraPos = camera.transform.position;
             
             // 填充数据
             cameraData.renderer = renderer;
