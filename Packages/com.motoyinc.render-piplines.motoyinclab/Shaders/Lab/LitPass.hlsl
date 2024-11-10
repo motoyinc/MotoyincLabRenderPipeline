@@ -26,6 +26,8 @@ UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
     UNITY_DEFINE_INSTANCED_PROP(float4, _BaseMap_ST)
     UNITY_DEFINE_INSTANCED_PROP(float4, _BaseColor)
     UNITY_DEFINE_INSTANCED_PROP(float, _Cutoff)
+    UNITY_DEFINE_INSTANCED_PROP(float, _Metallic)
+    UNITY_DEFINE_INSTANCED_PROP(float, _Roughness)
 UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
 Varyings LitPassVertex (Attributes input){
@@ -33,7 +35,7 @@ Varyings LitPassVertex (Attributes input){
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_TRANSFER_INSTANCE_ID(input, output); 
     output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
-    output.positionCS=TransformWorldToHClip(output.positionWS);
+    output.positionCS = TransformWorldToHClip(output.positionWS);
     output.normalWS = TransformObjectToWorldNormal(input.normalOS);
     float4 baseST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
     output.baseUV = input.baseUV * baseST.xy + baseST.zw;
@@ -51,8 +53,13 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     surface.color = baseMap * baseColor;
     surface.normal = normalize(input.normalWS);
     surface.alpha = baseColor.a;
+    surface.viewDirection = normalize(_WorldSpaceCameraPos - input.positionWS);
+    surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
+    surface.roughness =UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Roughness);
+
     //计算光照颜色
-    float3 color = GetLighting(surface, input.positionWS);
+    BRDFData brdf = GetBRDF(surface);
+    float3 color = GetLighting(surface, brdf, input.positionWS);
     
     #if defined(_CLIPPING)
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));

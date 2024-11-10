@@ -52,7 +52,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             SetupLights(context, ref renderingData);
             
             // 设置摄像机属性
-            context.SetupCameraProperties(camera);
+            SetPerCameraProperties(context, cameraData, camera, cmd);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             
@@ -79,6 +79,8 @@ namespace UnityEngine.Rendering.MotoyincLab
                 }
             }
         }
+        
+
 #if UNITY_EDITOR     
         void DrawGizmos (ScriptableRenderContext context,Camera camera) 
         {
@@ -89,5 +91,12 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
         }
 #endif
+        
+        // 初始相机设置
+        internal void SetPerCameraProperties(ScriptableRenderContext context, MotoyincLabCameraData cameraData, Camera camera, CommandBuffer cmd)
+        {
+            context.SetupCameraProperties(camera);
+            cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, cameraData.worldSpaceCameraPos);
+        }
     }
 }

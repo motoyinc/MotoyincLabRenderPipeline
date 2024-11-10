@@ -4,8 +4,11 @@
 struct SurfaceData
 {
     float3 normal;
+    float3 viewDirection;
     float3 color;
     float alpha;
+    float metallic;
+    float roughness;
 };
 
 #if defined(_GLOBAL_DEBUG)

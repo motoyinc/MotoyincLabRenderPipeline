@@ -11,8 +11,8 @@
 #define UNITY_MATRIX_P glstate_matrix_projection
 
 #include "UnityInput.hlsl"
-
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+
 // 坐标空间转换
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
 // float3 TransformObjectToWorld (float3 positionOS) {
@@ -23,6 +23,9 @@
 //     return mul(unity_MatrixVP, float4(positionWS, 1.0));
 // }
 
+float Square (float v) {
+    return v * v;
+}
 
 
 #endif
