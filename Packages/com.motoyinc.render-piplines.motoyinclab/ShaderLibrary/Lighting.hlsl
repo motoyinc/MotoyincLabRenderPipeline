@@ -17,9 +17,8 @@ float3 LightingLambert(SurfaceData surface, Light light) {
 
 float3 GetLighting(SurfaceData surface, BRDFData brdf, Light light)
 {
-    float3 diffuse = LightingLambert(surface, light); 
-    // return  diffuse * PhongSpecular(surface, light);
-    return diffuse * DirectBRDF(surface,brdf,light);
+    float3 diffuseIntensity = LightingLambert(surface, light); 
+    return diffuseIntensity * DirectBRDF(surface,brdf,light);
 }
 
 float3 GetLighting (SurfaceData surface, BRDFData brdf, float3 positionWS) {

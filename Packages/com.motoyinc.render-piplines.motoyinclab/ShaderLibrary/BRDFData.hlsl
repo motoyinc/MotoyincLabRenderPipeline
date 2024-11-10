@@ -13,6 +13,7 @@ struct BRDFData {
 };
 
 // 该函数的作用是把 metallic原本是0~1 映射到0~0.96
+// 并取反（金属度越大值越小）
 #define MIN_REFLECTIVITY 0.04
 float OneMinusReflectivity (float metallic) {
     float range = 1.0 - MIN_REFLECTIVITY;
@@ -29,7 +30,7 @@ BRDFData GetBRDF (SurfaceData surface) {
     return brdf;
 }
 
-float SpecularStrength (SurfaceData surface, BRDFData brdf, Light light) {
+float DirectBRDFSpecular (SurfaceData surface, BRDFData brdf, Light light) {
     float3 h = SafeNormalize(light.direction + surface.viewDirection);
     float nh2 = Square(saturate(dot(surface.normal, h)));
     float lh2 = Square(saturate(dot(light.direction, h)));
@@ -39,14 +40,14 @@ float SpecularStrength (SurfaceData surface, BRDFData brdf, Light light) {
     return r2 / (d2 * max(0.1, lh2) * normalization);
 }
 
-float PhongSpecular (SurfaceData surface, Light light) {
+float DirectBRDFPhongSpecular (SurfaceData surface, BRDFData brdf, Light light) {
     float3 r = SafeNormalize(reflect(-light.direction, surface.normal));
-    float specular = (1-surface.roughness) * pow(max(0.0, dot(r, surface.viewDirection)), (1-surface.roughness+0.01)*100);
-    return 1+specular;
+    float specular = (1-brdf.roughness) * pow(max(0.0, dot(r, surface.viewDirection)), (1-brdf.roughness+0.01)*100);
+    return specular;
 }
 
 float3 DirectBRDF (SurfaceData surface, BRDFData brdf, Light light) {
-    return SpecularStrength(surface, brdf, light) * brdf.specular  + brdf.diffuse;
+    return DirectBRDFSpecular(surface, brdf, light) * brdf.specular  + brdf.diffuse;
 }
 
 #endif
