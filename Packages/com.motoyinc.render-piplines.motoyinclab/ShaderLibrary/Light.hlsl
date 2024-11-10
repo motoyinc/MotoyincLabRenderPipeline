@@ -17,6 +17,7 @@ CBUFFER_END
 struct Light {
     float3 color;
     float3 direction;
+    float distance;
 };
 
 int GetAdditionalLightCount () {
@@ -30,12 +31,11 @@ Light GetAdditionalLight (int index, float3 positionWS) {
     float lightType = lightPositionWS.w;
     
     // 计算光的照射方向
-    light.direction = lightPositionWS.xyz - positionWS * lightType;
+    light.direction = normalize(lightPositionWS.xyz - positionWS * lightType);
+    light.distance = length(lightPositionWS.xyz - positionWS);
 
     // 计算光线衰减
-    float distance = length(light.direction);
-    light.direction = normalize(light.direction);
-    float distanceSqr = max(distance * distance, 0.000001);    // Distance^2
+    float distanceSqr = max(light.distance * light.distance, 0.000001);    // Distance^2
     float distanceAttenuation = saturate(1/(distanceSqr)); 
 
     // 光线范围计算
@@ -57,7 +57,8 @@ Light GetAdditionalLight (int index, float3 positionWS) {
 Light GetDirectionalLight () {
     Light light;
     light.color = _MainLightColor.rgb;
-    light.direction = _MainLightPosition.xyz;
+    light.direction = normalize(_MainLightPosition.xyz);
+    light.distance = 0.0;
     return light;
 }
 
@@ -65,6 +66,7 @@ Light _DEUBG_GetDirectionalLight() {
     Light light;
     light.color = 1.0;
     light.direction = normalize(float3(1.0, 1.0, 0.0));
+    light.distance = 0.0;
     return light;
 }
 
