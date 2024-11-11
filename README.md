@@ -13,7 +13,6 @@
 https://zhuanlan.zhihu.com/p/810720751
  
 ## 安装管线
-将下面这段链接复制到，Unity的 **PackageManager -> install package from git URL** 中
 ```URL
 https://github.com/motoyinc/MotoyincLabRenderPipeline.git?path=/Packages/com.motoyinc.render-piplines.motoyinclab
 ```
