@@ -84,7 +84,6 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
             else
                 cmd.SetKeyword(globalDebug,false);
-            cmd.EndSample(passName);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
 #endif

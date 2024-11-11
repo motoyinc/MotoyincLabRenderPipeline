@@ -9,8 +9,15 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 检查PassList，并清空List
             ClearRenderPassList();
             
-            var simpleRenderPass = new SimpleRenderPass();
-            renderPassList.Add(simpleRenderPass);
+            var opaqueRenderPass = new OpaqueRenderPass();
+            renderPassList.Add(opaqueRenderPass);
+            var skyboxRenderPass = new SkyboxRenderPass();
+            renderPassList.Add(skyboxRenderPass);
+            var transparentRenderPass = new TransparentRenderPass();
+            renderPassList.Add(transparentRenderPass);
+            
+            // var simpleRenderPass = new SimpleRenderPass();
+            // renderPassList.Add(simpleRenderPass);
             
             SetupRenderPass(context, ref renderingData);
             
