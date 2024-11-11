@@ -77,7 +77,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         static int GetMainLightIndex(MotoyincLabRenderPipelineAsset settings, NativeArray<VisibleLight> visibleLights)
         {
             int totalVisibleLights = visibleLights.Length;
-            if (totalVisibleLights == 0 || settings.mainLightRenderingMode != LightRenderingMode.PerPixel)
+            if (totalVisibleLights == 0)
                 return -1;
             
             Light sunLight = RenderSettings.sun;

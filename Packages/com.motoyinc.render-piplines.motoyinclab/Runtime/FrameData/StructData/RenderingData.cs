@@ -39,43 +39,4 @@
 
     }
     
-    public struct CameraData
-    {
-        internal ContextContainer frameData;
-
-        internal CameraData(ContextContainer frameData)
-        {
-            this.frameData = frameData;
-        }
-    }
-    
-    public struct LightData
-    {
-        internal ContextContainer frameData;
-
-        internal LightData(ContextContainer frameData)
-        {
-            this.frameData = frameData;
-        }
-    }
-    
-    public struct ShadowData
-    {
-        internal ContextContainer frameData;
-
-        internal ShadowData(ContextContainer frameData)
-        {
-            this.frameData = frameData;
-        }
-    }
-    
-    public struct PostProcessingData
-    {
-        internal ContextContainer frameData;
-
-        internal PostProcessingData(ContextContainer frameData)
-        {
-            this.frameData = frameData;
-        }
-    }
 }

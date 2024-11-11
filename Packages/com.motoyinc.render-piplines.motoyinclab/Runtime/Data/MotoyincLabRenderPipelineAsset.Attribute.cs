@@ -31,7 +31,6 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] bool m_SupportsDynamicBatching = false;
         
         // Lighting setting
-        [SerializeField] LightRenderingMode m_MainLightRenderingMode = LightRenderingMode.PerPixel;
 
 #if UNITY_EDITOR
         // Debug mode
@@ -62,10 +61,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             set => m_SupportsDynamicBatching = value;
         }
         
-        public LightRenderingMode mainLightRenderingMode
         {
-            get => m_MainLightRenderingMode;
-            internal set => m_MainLightRenderingMode = value;
         }
         
         public ReadOnlySpan<ScriptableRenderer> renderers => m_Renderers;
