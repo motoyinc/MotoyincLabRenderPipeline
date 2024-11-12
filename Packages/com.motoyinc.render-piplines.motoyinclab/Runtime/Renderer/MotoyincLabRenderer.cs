@@ -1,5 +1,10 @@
 ﻿namespace UnityEngine.Rendering.MotoyincLab
 {
+    public enum RenderingMode
+    {
+        Forward = 0,
+        Deferred = 1
+    };
     public sealed partial class MotoyincLabRenderer : ScriptableRenderer
     {
         private RenderingMode m_RenderingMode;
