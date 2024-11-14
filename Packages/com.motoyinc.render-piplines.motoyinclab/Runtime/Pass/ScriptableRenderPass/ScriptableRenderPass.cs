@@ -14,8 +14,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         public abstract void Execute(ScriptableRenderContext context, ref RenderingData renderingData);
 
-        public virtual void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
-        { }
+        public virtual void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor) { }
         
         public virtual void Dispose()
         {

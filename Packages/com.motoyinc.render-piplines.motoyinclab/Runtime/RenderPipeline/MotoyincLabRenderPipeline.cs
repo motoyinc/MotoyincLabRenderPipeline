@@ -29,6 +29,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             get => GraphicsSettings.currentRenderPipeline as MotoyincLabRenderPipelineAsset;
         }
+        public static float minRenderScale { get => 0.1f; }
+        public static float maxRenderScale { get => 2.0f; }
         
         public MotoyincLabRenderPipeline(MotoyincLabRenderPipelineAsset asset)
         {

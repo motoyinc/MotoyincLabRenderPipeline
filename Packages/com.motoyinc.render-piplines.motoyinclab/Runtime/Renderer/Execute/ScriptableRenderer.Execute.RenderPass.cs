@@ -39,6 +39,22 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
         }
         
+        void ConfigureRenderPassList(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            var cmd = renderingData.commandBuffer;
+            if (renderPassList.Count != 0)
+            {
+                for (int i = 0; i < renderPassList.Count; ++i)
+                {
+                    if (renderPassList[i] != null)
+                    {
+                        renderPassList[i].Configure(cmd, cameraData.cameraTargetDescriptor);
+                    }
+                }
+            }
+        }
+        
         
         
         /// ///////////////////////////////////////////////////////////////////// /// 

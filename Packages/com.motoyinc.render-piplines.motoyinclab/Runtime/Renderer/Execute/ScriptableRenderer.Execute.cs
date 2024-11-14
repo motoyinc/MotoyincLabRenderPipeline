@@ -15,6 +15,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             Camera camera = cameraData.camera;
             var cmd = renderingData.commandBuffer;
             
+            // 执行Pass Configure
+            ConfigureRenderPassList(context, ref renderingData);
+            
             // 设置灯光
             SetupLights(context, ref renderingData);
             
