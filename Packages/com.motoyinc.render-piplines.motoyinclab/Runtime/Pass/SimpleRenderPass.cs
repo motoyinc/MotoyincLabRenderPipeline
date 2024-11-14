@@ -7,17 +7,19 @@ namespace UnityEngine.Rendering.MotoyincLab
     {
         public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
-            var data = renderingData.frameData.Get<MotoyincLabRenderingData>();
-            cullingResults = data.cullResults;
-            camera = cameraData.camera;
-            cmd = renderingData.commandBuffer;
             passName = "SimpleRenderPass";
             
         }
         
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            var cmd = renderingData.commandBuffer;
+            var motoyincLabRenderingData = renderingData.frameData.Get<MotoyincLabRenderingData>();
+            var cullingResults = motoyincLabRenderingData.cullResults;
+            var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            var camera = cameraData.camera;
+            
+            
             cmd.BeginSample(passName);
             
             // --------------------------Begin----------------------------
@@ -134,7 +136,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             // ----------Begin：编辑器内渲染---------
 #if UNITY_EDITOR 
-            DrawUnsupportedShaders(context,cullingResults);
+            DrawUnsupportedShaders(context, cullingResults, cmd, camera);
             
             //【本段代码已迁移至 Renderer.Execute() 中】
             //
@@ -164,7 +166,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         };
         
         // 渲染不受支持材质球
-        void DrawUnsupportedShaders(ScriptableRenderContext context, CullingResults cullingResults)
+        void DrawUnsupportedShaders(ScriptableRenderContext context, CullingResults cullingResults, CommandBuffer cmd, Camera camera)
         {
             // 渲染顺序
             var sortingSettings = new SortingSettings(camera);

@@ -7,17 +7,25 @@ namespace UnityEngine.Rendering.MotoyincLab
     {
         public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
-            var data = renderingData.frameData.Get<MotoyincLabRenderingData>();
-            cullingResults = data.cullResults;
-            camera = cameraData.camera;
-            cmd = renderingData.commandBuffer;
             passName = "OpaqueRenderPass";
             
         }
-        
+
+        public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+        {
+            base.Configure(cmd, cameraTextureDescriptor);
+        }
+
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            var cmd = renderingData.commandBuffer;
+            var motoyincLabRenderingData = renderingData.frameData.Get<MotoyincLabRenderingData>();
+            var cullingResults = motoyincLabRenderingData.cullResults;
+            var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            var camera = cameraData.camera;
+            
+            
+            
             cmd.BeginSample(passName);
             using var profScope = new ProfilingScope(new ProfilingSampler(passName));
             
@@ -39,7 +47,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.Clear();
             
 #if UNITY_EDITOR 
-            DrawUnsupportedShaders(context,cullingResults);
+            DrawUnsupportedShaders(context, cullingResults, cmd, camera);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
 #endif
@@ -58,7 +66,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         };
         
         // 渲染不受支持材质球
-        void DrawUnsupportedShaders(ScriptableRenderContext context, CullingResults cullingResults)
+        void DrawUnsupportedShaders(ScriptableRenderContext context, CullingResults cullingResults, CommandBuffer cmd, Camera camera)
         {
             // 渲染顺序
             var sortingSettings = new SortingSettings(camera);

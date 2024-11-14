@@ -7,17 +7,19 @@ namespace UnityEngine.Rendering.MotoyincLab
     {
         public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
-            var data = renderingData.frameData.Get<MotoyincLabRenderingData>();
-            cullingResults = data.cullResults;
-            camera = cameraData.camera;
-            cmd = renderingData.commandBuffer;
             passName = "SkyboxRenderPass";
             
         }
         
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            var cmd = renderingData.commandBuffer;
+            var motoyincLabRenderingData = renderingData.frameData.Get<MotoyincLabRenderingData>();
+            var cullingResults = motoyincLabRenderingData.cullResults;
+            var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            var camera = cameraData.camera;
+            
+            
             cmd.BeginSample(passName);
             
              if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)

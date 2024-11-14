@@ -4,15 +4,20 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public abstract partial class ScriptableRenderPass: IDisposable
     {
-        public string passName = "";
-        public CommandBuffer cmd;
-        public MotoyincLabCameraData cameraData;
-        public Camera camera;
-        public CullingResults cullingResults;
+        private string m_PassName;
+        protected internal string passName{ 
+            get => m_PassName; 
+            set => m_PassName = value;
+        }
+        
         public abstract void Setup(ScriptableRenderContext context, ref RenderingData renderingData);
+        
         public abstract void Execute(ScriptableRenderContext context, ref RenderingData renderingData);
 
-        public void Dispose()
+        public virtual void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+        { }
+        
+        public virtual void Dispose()
         {
             GC.SuppressFinalize(this);
         }
