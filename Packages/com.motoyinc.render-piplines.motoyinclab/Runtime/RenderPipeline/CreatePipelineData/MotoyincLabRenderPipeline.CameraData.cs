@@ -1,4 +1,5 @@
-using UnityEngine.Experimental.Rendering;
+﻿using UnityEngine.Experimental.Rendering;
+
 namespace UnityEngine.Rendering.MotoyincLab
 {
     public partial class MotoyincLabRenderPipeline
@@ -52,6 +53,16 @@ namespace UnityEngine.Rendering.MotoyincLab
             var renderer = GetRenderer(camera, additionalCameraData);
             var settings = asset;
             
+            
+            // 相机背景色
+            var backgroundColorSRGB = camera.backgroundColor;
+#if UNITY_EDITOR
+            if (camera.cameraType == CameraType.Preview && camera.clearFlags != CameraClearFlags.SolidColor)
+            {
+                backgroundColorSRGB = CoreRenderPipelinePreferences.previewBackgroundColor;
+            }
+#endif
+            cameraData.backgroundColor = CoreUtils.ConvertSRGBToActiveColorSpace(backgroundColorSRGB);
 
             // 相机坐标
             cameraData.worldSpaceCameraPos = camera.transform.position;
@@ -64,14 +75,17 @@ namespace UnityEngine.Rendering.MotoyincLab
             if (isSceneViewCamera)
             {
                 cameraData.renderType = CameraRenderType.Base;
+                cameraData.clearDepth = true;
             }
             else if (additionalCameraData != null)
             {
                 cameraData.renderType = additionalCameraData.renderType;
+                cameraData.clearDepth = (additionalCameraData.renderType != CameraRenderType.Base) ? additionalCameraData.clearDepth : true;
             }
             else
             {
                 cameraData.renderType = CameraRenderType.Base;
+                cameraData.clearDepth = true;
             }
         }
         

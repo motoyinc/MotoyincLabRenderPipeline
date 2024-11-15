@@ -23,6 +23,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         public Vector3 worldSpaceCameraPos;
         
+        public bool clearDepth;
+        public Color backgroundColor;
         
         public bool isHdrEnabled;
         public RenderTextureDescriptor cameraTargetDescriptor;
@@ -50,6 +52,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             hdrColorBufferPrecision = HDRColorBufferPrecision._32Bits;
             cameraTargetDescriptor = default;
             renderScale = 1.0f;
+            
+            backgroundColor = Color.black;
+            clearDepth = false;
         }
     }
 }
