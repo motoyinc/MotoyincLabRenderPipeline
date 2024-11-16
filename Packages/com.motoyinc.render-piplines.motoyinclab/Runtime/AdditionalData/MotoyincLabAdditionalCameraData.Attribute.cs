@@ -12,14 +12,15 @@ namespace UnityEngine.Rendering.MotoyincLab
         Base,
         Overlay
     }
+
     public partial class MotoyincLabAdditionalCameraData
     {
         // 相机类型
-        [SerializeField] private CameraRenderType m_cameraRenderType = CameraRenderType.Base;
+        [SerializeField] CameraRenderType m_CameraType = CameraRenderType.Base;
         public CameraRenderType renderType
         {
-            get => m_cameraRenderType;
-            set => m_cameraRenderType = value;
+            get => m_CameraType;
+            set => m_CameraType = value;
         }
         
         // 相机列表（堆叠相机）
@@ -43,6 +44,28 @@ namespace UnityEngine.Rendering.MotoyincLab
                     return null;
                 }
                 return m_Cameras;
+            }
+        }
+        
+        
+        // 相机深度清理
+        [SerializeField] bool m_ClearDepth = true;
+        public bool clearDepth
+        {
+            get => m_ClearDepth;
+        }
+        
+        // 相机属性变动设置
+        void Start()
+        {
+            if (m_CameraType == CameraRenderType.Overlay)
+                camera.clearFlags = CameraClearFlags.Nothing;
+        }
+        public void OnValidate()
+        {
+            if (m_CameraType == CameraRenderType.Overlay && m_Camera != null)
+            {
+                m_Camera.clearFlags = CameraClearFlags.Nothing;
             }
         }
         

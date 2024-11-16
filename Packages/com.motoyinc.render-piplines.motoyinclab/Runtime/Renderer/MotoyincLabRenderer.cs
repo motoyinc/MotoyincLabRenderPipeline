@@ -1,5 +1,11 @@
 ﻿namespace UnityEngine.Rendering.MotoyincLab
 {
+    public enum RenderingMode
+    {
+        Forward = 0,
+        ForwardPuls = 1,
+        Deferred = 2
+    };
     public sealed partial class MotoyincLabRenderer : ScriptableRenderer
     {
         private RenderingMode m_RenderingMode;
@@ -30,6 +36,13 @@
         protected override void Dispose(bool disposing)
         {
             m_ForwardLights.Cleanup();
+            ClearRenderPassList();
+            ReleaseRenderTargets();
+        }
+
+        internal override void ReleaseRenderTargets()
+        {
+            base.ReleaseRenderTargets();
         }
     }
 }

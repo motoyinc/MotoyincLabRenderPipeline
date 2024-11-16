@@ -27,7 +27,8 @@ namespace UnityEngine.Rendering.MotoyincLab
     internal enum MLRPProfileId
     {
         MotoyincLabRenderTotal,
-        RenderCameraStack
+        RenderCameraStack,
+        MainLightShadow
     }
     
     public enum GlobalDebugMode

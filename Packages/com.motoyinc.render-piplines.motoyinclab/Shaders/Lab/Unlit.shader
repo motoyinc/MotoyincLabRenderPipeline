@@ -14,7 +14,7 @@
     {
         Pass
         {
-            Tags { "LightMode" = "Unlit"}
+            Tags { "LightMode" = "MotoyincLabRenderPipeline"}
             Blend [_SrcBlend] [_DstBlend]
 			ZWrite [_ZWrite]
 			

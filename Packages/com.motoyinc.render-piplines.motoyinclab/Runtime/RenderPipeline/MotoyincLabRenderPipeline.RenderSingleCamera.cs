@@ -27,6 +27,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             CommandBuffer cmd = CommandBufferPool.Get();
             CommandBuffer cmdScope = cmd;
             
+            renderer.Clear(cameraData.renderType);
+
             var data = frameData.Create<MotoyincLabRenderingData>(); 
             data.cullResults = context.Cull(ref cullingParameters);
             var cameraMetadataSampler = CameraMetadataCache.GetCached(camera).sampler;
@@ -44,7 +46,9 @@ namespace UnityEngine.Rendering.MotoyincLab
                 if (cameraData.isSceneViewCamera)
                     ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
 #endif
-
+                
+                RTHandles.SetReferenceSize(cameraData.cameraTargetDescriptor.width, cameraData.cameraTargetDescriptor.height);
+                
                 
                 // 整理帧数据
                 using (new ProfilingScope(Profiling.Pipeline.initializeRenderingData))

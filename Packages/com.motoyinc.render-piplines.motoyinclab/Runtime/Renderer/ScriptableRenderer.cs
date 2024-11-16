@@ -17,11 +17,13 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         public ScriptableRenderer(ScriptableRendererData rendererData)
         {
-            
+            Clear(CameraRenderType.Base);
         }
 
         public void Dispose()
         {
+            ReleaseRenderTargets();
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
         protected virtual void Dispose(bool disposing)

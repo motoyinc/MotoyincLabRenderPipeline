@@ -16,6 +16,25 @@ namespace UnityEngine.Rendering.MotoyincLab
         _2DRenderer,
     }
     
+    public enum HDRColorBufferPrecision
+    {
+        /// <summary> Typically R11G11B10f for faster rendering. Recommend for mobile.
+        /// R11G11B10f can cause a subtle blue/yellow banding in some rare cases due to lower precision of the blue component.</summary>
+        [Tooltip("Use 32-bits per pixel for HDR rendering.")]
+        _32Bits,
+        /// <summary>Typically R16G16B16A16f for better quality. Can reduce banding at the cost of memory and performance.</summary>
+        [Tooltip("Use 64-bits per pixel for HDR rendering.")]
+        _64Bits,
+    }
+    
+    public enum MsaaQuality
+    {
+        Disabled = 1,
+        _2x = 2,
+        _4x = 4,
+        _8x = 8
+    }
+    
     public partial class MotoyincLabRenderPipelineAsset
     {
         // Renderer Data 与 Renderer
@@ -25,13 +44,16 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         // Quality settings
         [SerializeField] bool m_SupportsHDR = true;
+        [SerializeField] HDRColorBufferPrecision m_HDRColorBufferPrecision = HDRColorBufferPrecision._32Bits;
+        [SerializeField] MsaaQuality m_MSAA = MsaaQuality.Disabled;
+        [SerializeField] float m_RenderScale = 1.0f;
+        
         
         // Advanced settings
         [SerializeField] bool m_UseSRPBatcher = true;
         [SerializeField] bool m_SupportsDynamicBatching = false;
         
         // Lighting setting
-        [SerializeField] LightRenderingMode m_MainLightRenderingMode = LightRenderingMode.PerPixel;
 
 #if UNITY_EDITOR
         // Debug mode
@@ -62,10 +84,27 @@ namespace UnityEngine.Rendering.MotoyincLab
             set => m_SupportsDynamicBatching = value;
         }
         
-        public LightRenderingMode mainLightRenderingMode
+        
+        public HDRColorBufferPrecision hdrColorBufferPrecision
         {
-            get => m_MainLightRenderingMode;
-            internal set => m_MainLightRenderingMode = value;
+            get => m_HDRColorBufferPrecision;
+            set => m_HDRColorBufferPrecision = value;
+        }
+        
+        public int msaaSampleCount
+        {
+            get => (int)m_MSAA;
+            set => m_MSAA = (MsaaQuality)value;
+        }
+        
+        public float renderScale
+        {
+            get => m_RenderScale;
+            set => m_RenderScale = ValidateRenderScale(value);
+        }
+        float ValidateRenderScale(float value)
+        {
+            return Mathf.Max(MotoyincLabRenderPipeline.minRenderScale, Mathf.Min(value, MotoyincLabRenderPipeline.maxRenderScale));
         }
         
         public ReadOnlySpan<ScriptableRenderer> renderers => m_Renderers;
