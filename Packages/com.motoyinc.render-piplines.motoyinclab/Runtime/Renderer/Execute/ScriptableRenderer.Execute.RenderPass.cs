@@ -83,7 +83,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             var cmd = renderingData.commandBuffer;
             
             // 设置渲染目标 SetRenderTarget
-            SetRenderPassAttachments(cmd, renderPass, cameraData);
+            SetRenderPassAttachments(cmd, renderPass, cameraData); 
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             
@@ -93,11 +93,5 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.Clear();
         }
 
-        
-        // 设置渲染目标 SetRenderTarget
-        void SetRenderPassAttachments(CommandBuffer cmd, ScriptableRenderPass renderPass, MotoyincLabCameraData cameraData)
-        {
-            // cmd.SetRenderTarget();
-        }
     }
 }

@@ -27,6 +27,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             CommandBuffer cmd = CommandBufferPool.Get();
             CommandBuffer cmdScope = cmd;
             
+            renderer.Clear(cameraData.renderType);
+
             var data = frameData.Create<MotoyincLabRenderingData>(); 
             data.cullResults = context.Cull(ref cullingParameters);
             var cameraMetadataSampler = CameraMetadataCache.GetCached(camera).sampler;

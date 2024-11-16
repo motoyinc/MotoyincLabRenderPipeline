@@ -4,6 +4,11 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public class RenderingUtils
     {
+        internal static bool IsMRT(RTHandle[] colorBuffers)
+        {
+            return GetValidColorBufferCount(colorBuffers) > 1;
+        }
+        
         internal static uint GetValidColorBufferCount(RTHandle[] colorBuffers)
         {
             uint nonNullColorBuffers = 0;

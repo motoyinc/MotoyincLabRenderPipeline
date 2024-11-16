@@ -3,7 +3,8 @@
     public enum RenderingMode
     {
         Forward = 0,
-        Deferred = 1
+        ForwardPuls = 1,
+        Deferred = 2
     };
     public sealed partial class MotoyincLabRenderer : ScriptableRenderer
     {
@@ -35,6 +36,13 @@
         protected override void Dispose(bool disposing)
         {
             m_ForwardLights.Cleanup();
+            ClearRenderPassList();
+            ReleaseRenderTargets();
+        }
+
+        internal override void ReleaseRenderTargets()
+        {
+            base.ReleaseRenderTargets();
         }
     }
 }

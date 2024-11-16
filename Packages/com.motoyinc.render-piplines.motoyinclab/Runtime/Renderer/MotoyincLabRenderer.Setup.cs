@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace UnityEngine.Rendering.MotoyincLab
 {
@@ -8,6 +10,11 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             // 检查PassList，并清空List
             ClearRenderPassList();
+            var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
+            var camera = cameraData.camera;
+            
+            // 配置默认RT
+            ConfigureCameraTarget(k_CameraTarget, k_CameraTarget);
             
             var shadowsPass = new MainLightShadowCasterPass();
             renderPassList.Add(shadowsPass);
