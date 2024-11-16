@@ -16,8 +16,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 配置默认RT
             ConfigureCameraTarget(k_CameraTarget, k_CameraTarget);
             
-            var shadowsPass = new MainLightShadowCasterPass();
-            renderPassList.Add(shadowsPass);
+            // var shadowsPass = new MainLightShadowCasterPass();
+            // renderPassList.Add(shadowsPass);
             var opaqueRenderPass = new OpaqueRenderPass();
             renderPassList.Add(opaqueRenderPass);
             var skyboxRenderPass = new SkyboxRenderPass();
@@ -54,10 +54,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             m_ForwardLights.SetupLights(cmd, motoyincLabRenderingData, cameraData, lightData);
         }
 
-        public override void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData)
-        {
-            cullingParameters.shadowDistance = cameraData.maxShadowDistance;
-        }
+        // public override void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData)
+        // {
+        //     cullingParameters.shadowDistance = cameraData.maxShadowDistance;
+        // }
     }
     
 }
