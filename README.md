@@ -42,9 +42,3 @@ During the development of this project, I referenced and benefited greatly from 
    感谢 Unity Technologies 提供的 Universal Render Pipeline (URP) 开源代码及文档支持。URP 的代码结构和实现逻辑为本项目提供了重要的参考，并帮助我理解了 Unity 渲染管线的底层机制。  
    Thanks to Unity Technologies for providing the open-source code and documentation for the Universal Render Pipeline (URP). The structure and implementation of URP served as a significant reference for this project, helping me better understand the underlying mechanisms of Unity’s rendering pipeline.  
    URP Repository: [https://github.com/Unity-Technologies/Graphics](https://github.com/Unity-Technologies/Graphics)
-
----
-
-通过这些优秀资源的支持和启发，本项目得以更好地实现目标。在此对所有为技术社区提供支持的作者、开发者和贡献者致以最诚挚的谢意。
-
-With the support and inspiration from these exceptional resources, this project was able to achieve its goals more effectively. I extend my heartfelt thanks to all authors, developers, and contributors who continue to support the technical community.
