@@ -23,12 +23,12 @@ https://github.com/motoyinc/MotoyincLabRenderPipeline.git?path=/Packages/com.mot
 
 
 
-
+---
 
 #### **参考文献 References**
 
-[1] J. Flick, “Custom SRP Tutorial,” Catlike Coding, [Online]. Available: [https://catlikecoding.com/unity/tutorials/custom-srp/](https://catlikecoding.com/unity/tutorials/custom-srp/). [Accessed: Nov. 21, 2024].
+[1] J. Flick, “tutorials for Unity” Catlike Coding, [Online]. Available: [https://catlikecoding.com/unity/tutorials/](https://catlikecoding.com/unity/tutorials/).
 
-[2] Unity Technologies, “Universal Render Pipeline (URP) Source Code,” GitHub repository, 2020. [Online]. Available: [https://github.com/Unity-Technologies/Graphics](https://github.com/Unity-Technologies/Graphics). [Accessed: Nov. 21, 2024].
+[2] Unity Technologies, “Universal Render Pipeline (URP) Source Code,” GitHub repository, 2020. [Online]. Available: [https://github.com/Unity-Technologies/Graphics](https://github.com/Unity-Technologies/Graphics). 
 
 在本项目的开发过程中，我参考并受益于以上资源，在此对其作者和贡献者表示感谢！
