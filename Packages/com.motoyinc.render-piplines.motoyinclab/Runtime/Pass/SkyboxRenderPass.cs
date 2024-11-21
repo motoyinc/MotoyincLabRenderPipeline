@@ -5,10 +5,10 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public class SkyboxRenderPass: ScriptableRenderPass
     {
-        public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override bool Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             passName = "SkyboxRenderPass";
-            
+            return true;
         }
         
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)

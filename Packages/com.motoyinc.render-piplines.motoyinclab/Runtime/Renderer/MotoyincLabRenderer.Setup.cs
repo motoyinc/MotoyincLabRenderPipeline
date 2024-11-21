@@ -16,33 +16,27 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 配置默认RT
             ConfigureCameraTarget(k_CameraTarget, k_CameraTarget);
             
-            var shadowsPass = new MainLightShadowCasterPass();
-            renderPassList.Add(shadowsPass);
+            
+            // 不透明Pass
             var opaqueRenderPass = new OpaqueRenderPass();
-            renderPassList.Add(opaqueRenderPass);
+            var isOpaqueRenderPass = opaqueRenderPass.Setup(context,ref renderingData);
+            if (isOpaqueRenderPass)
+                renderPassList.Add(opaqueRenderPass);
+            
+            // 天空球Pass
             var skyboxRenderPass = new SkyboxRenderPass();
-            renderPassList.Add(skyboxRenderPass);
+            var isSkyboxRenderPass = skyboxRenderPass.Setup(context,ref renderingData);
+            if (isSkyboxRenderPass)
+                renderPassList.Add(skyboxRenderPass);
+            
+            // 半透明Pass
             var transparentRenderPass = new TransparentRenderPass();
-            renderPassList.Add(transparentRenderPass);
-            
-            // var simpleRenderPass = new SimpleRenderPass();
-            // renderPassList.Add(simpleRenderPass);
-            
-            SetupRenderPass(context, ref renderingData);
+            var isTransparentRenderPass = transparentRenderPass.Setup(context,ref renderingData);
+            if (isTransparentRenderPass)
+                renderPassList.Add(transparentRenderPass);
             
         }
 
-        void SetupRenderPass(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            if (renderPassList.Count != 0)
-            {
-                for (int i = 0; i < renderPassList.Count; ++i)
-                {
-                    if (renderPassList[i] != null)
-                        renderPassList[i].Setup(context, ref renderingData);
-                }
-            }
-        }
 
         public override void SetupLights(ScriptableRenderContext context, ref RenderingData renderingData)
         {

@@ -5,10 +5,10 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public class TransparentRenderPass: ScriptableRenderPass
     {
-        public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override bool Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             passName = "TransparentRenderPass";
-            
+            return true;
         }
         
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
