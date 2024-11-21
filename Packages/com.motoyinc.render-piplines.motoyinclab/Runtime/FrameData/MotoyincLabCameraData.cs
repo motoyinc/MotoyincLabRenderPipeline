@@ -22,6 +22,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         public CameraRenderType renderType;
         
         public Vector3 worldSpaceCameraPos;
+        public float maxShadowDistance;
         
         public bool clearDepth;
         public Color backgroundColor;
@@ -47,6 +48,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             camera = null;
             cameraType = CameraType.Game;
             worldSpaceCameraPos = default;
+            maxShadowDistance = 0.0f;
             
             isHdrEnabled = false;
             hdrColorBufferPrecision = HDRColorBufferPrecision._32Bits;

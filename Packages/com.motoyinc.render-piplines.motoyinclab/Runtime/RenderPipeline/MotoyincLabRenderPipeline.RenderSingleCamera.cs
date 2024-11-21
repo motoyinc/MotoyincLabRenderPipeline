@@ -35,8 +35,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             using (new ProfilingScope(cmdScope, cameraMetadataSampler))
             {
                 // 渲染操作
-                // cmd.ClearRenderTarget(true, true, Color.black);
-                Catlikecoding_ClearRenderTarget(context, cmd, camera);
+                cmd.ClearRenderTarget(true, true, Color.black);
+                // Catlikecoding_ClearRenderTarget(context, cmd, camera);
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
                 
@@ -49,15 +49,17 @@ namespace UnityEngine.Rendering.MotoyincLab
                 
                 RTHandles.SetReferenceSize(cameraData.cameraTargetDescriptor.width, cameraData.cameraTargetDescriptor.height);
                 
+                var isForwardPlus = false;
                 
                 // 整理帧数据
                 using (new ProfilingScope(Profiling.Pipeline.initializeRenderingData))
                 {
-                    CreateRenderingData(frameData, asset, cmd, false, cameraData.renderer);
                     CreateLightData(frameData, asset, data.cullResults.visibleLights);
+                    CreateShadowData(frameData, asset, isForwardPlus);
+                    CreateRenderingData(frameData, asset, cmd, false, cameraData.renderer);
                 }
                 RenderingData legacyRenderingData = new RenderingData(frameData);
-            
+                
                 // 渲染器
                 using (new ProfilingScope(Profiling.Pipeline.Renderer.setup))
                 {
