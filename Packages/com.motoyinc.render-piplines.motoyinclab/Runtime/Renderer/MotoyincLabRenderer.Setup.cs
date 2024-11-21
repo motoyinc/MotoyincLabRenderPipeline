@@ -54,9 +54,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             m_ForwardLights.SetupLights(cmd, motoyincLabRenderingData, cameraData, lightData);
         }
 
-        public override void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData)
+        public override void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData) 
         {
-            cullingParameters.shadowDistance = cameraData.maxShadowDistance;
+            cullingParameters.shadowDistance = cameraData.maxShadowDistance; 
         }
     }
     
