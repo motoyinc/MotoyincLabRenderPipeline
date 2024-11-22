@@ -24,7 +24,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             
              if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)
              {
-                 context.DrawSkybox(camera);
+                 var skyRendererList = context.CreateSkyboxRendererList(cameraData.camera);
+                 cmd.DrawRendererList(skyRendererList);
              }
 
             cmd.EndSample(passName);
