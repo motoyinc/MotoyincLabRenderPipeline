@@ -1,0 +1,48 @@
+Copyright 2024 motoyinc(motoyinc@gmail.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+版权所有 2024 猫头鹰也是猫(motoyinc@gmail.com)
+
+根据 Apache 许可证 2.0 版（以下简称“许可证”）授权；
+除非遵守许可证的规定，否则您不能使用此文件。
+您可以通过以下链接获得许可证的副本：
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+除非适用法律要求或书面同意，根据许可证分发的软件是按“现状”（“AS IS”）提供的，
+不附带任何明示或暗示的担保或条件。
+有关许可证下具体权限与限制的信息，请参阅许可证。
+
+-------------------------------------------------------------
+
+Project Information:
+
+This project, named “Motoyinc Lab Render Pipeline” (hereinafter referred to as “MLabRP”), is based on Unity's Scriptable Render Pipeline (SRP) framework.
+The entire project, including its source code, documentation, and associated resources,
+is licensed under the Apache License, Version 2.0.
+
+Repository:
+The project is hosted at:
+    https://github.com/motoyinc/MotoyincLabRenderPipeline
+
+
+项目信息：
+
+本项目全称为 “Motoyinc Lab Render Pipeline”（以下简称 “MLabRP”），基于 Unity 的 Scriptable Render Pipeline (SRP) 框架开发，扩展了其功能并实现了自定义特性。
+整个项目，包括其源代码、文档以及相关资源，均依据 Apache 许可证 2.0 授权。
+
+仓库地址：
+该项目托管于：
+    https://github.com/motoyinc/MotoyincLabRenderPipeline
