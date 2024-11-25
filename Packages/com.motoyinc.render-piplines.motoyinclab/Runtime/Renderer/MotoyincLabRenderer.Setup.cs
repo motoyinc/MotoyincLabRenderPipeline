@@ -18,22 +18,19 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             
             // 不透明Pass
-            var opaqueRenderPass = new OpaqueRenderPass();
-            var isOpaqueRenderPass = opaqueRenderPass.Setup(context,ref renderingData);
+            var isOpaqueRenderPass = m_opaqueRenderPass.Setup(context,ref renderingData);
             if (isOpaqueRenderPass)
-                renderPassList.Add(opaqueRenderPass);
+                renderPassList.Add(m_opaqueRenderPass);
             
             // 天空球Pass
-            var skyboxRenderPass = new SkyboxRenderPass();
-            var isSkyboxRenderPass = skyboxRenderPass.Setup(context,ref renderingData);
+            var isSkyboxRenderPass = m_skyboxRenderPass.Setup(context,ref renderingData);
             if (isSkyboxRenderPass)
-                renderPassList.Add(skyboxRenderPass);
+                renderPassList.Add(m_skyboxRenderPass);
             
             // 半透明Pass
-            var transparentRenderPass = new TransparentRenderPass();
-            var isTransparentRenderPass = transparentRenderPass.Setup(context,ref renderingData);
+            var isTransparentRenderPass = m_transparentRenderPass.Setup(context,ref renderingData);
             if (isTransparentRenderPass)
-                renderPassList.Add(transparentRenderPass);
+                renderPassList.Add(m_transparentRenderPass);
             
         }
 
