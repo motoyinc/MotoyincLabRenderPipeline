@@ -30,7 +30,6 @@ namespace UnityEngine.Rendering.MotoyincLab
                 {
                     if (m_RenderPassList[i] != null)
                     {
-                        m_RenderPassList[i].Dispose();
                         m_RenderPassList[i] = null;
                     }
                 }
