@@ -16,3 +16,4 @@ Assembly-CSharp.csproj
 /Motoyinc.RenderPipeline.MotoyincLab.ShaderLibrary.csproj
 /Motoyinc.RenderPipeline.MotoyincLab.Shaders.csproj
 Motoyinc.RenderPipeline.MotoyincLab.Editor.csproj
+Assembly-CSharp-Editor.csproj
