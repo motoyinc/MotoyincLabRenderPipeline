@@ -5,7 +5,6 @@
 //      仅用于编辑时不报错，防止嵌套式依赖关系，使代码变得难以维护
 //      但也意味着，使用该库，必须包含以下依赖库
 #include "SurfaceData.hlsl"
-#include "Shadows.hlsl"
 #include "RealtimeLight.hlsl"
 #include "BRDFData.hlsl"
 
