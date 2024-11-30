@@ -27,6 +27,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 {
                     const string k_Name = nameof(ScriptableRenderer);
                     public static readonly ProfilingSampler setup = new ProfilingSampler($"{k_Name}.{nameof(ScriptableRenderer.Setup)}");
+                    public static readonly ProfilingSampler setupCullingParameters = new ProfilingSampler($"{k_Name}.{nameof(ScriptableRenderer.SetupCullingParameters)}");
                 };
                 
                 public static class Context

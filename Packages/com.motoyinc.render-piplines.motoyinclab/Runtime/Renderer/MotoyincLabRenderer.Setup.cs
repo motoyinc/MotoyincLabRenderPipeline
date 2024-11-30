@@ -16,33 +16,24 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 配置默认RT
             ConfigureCameraTarget(k_CameraTarget, k_CameraTarget);
             
-            // var shadowsPass = new MainLightShadowCasterPass();
-            // renderPassList.Add(shadowsPass);
-            var opaqueRenderPass = new OpaqueRenderPass();
-            renderPassList.Add(opaqueRenderPass);
-            var skyboxRenderPass = new SkyboxRenderPass();
-            renderPassList.Add(skyboxRenderPass);
-            var transparentRenderPass = new TransparentRenderPass();
-            renderPassList.Add(transparentRenderPass);
             
-            // var simpleRenderPass = new SimpleRenderPass();
-            // renderPassList.Add(simpleRenderPass);
+            // 不透明Pass
+            var isOpaqueRenderPass = m_opaqueRenderPass.Setup(context,ref renderingData);
+            if (isOpaqueRenderPass)
+                renderPassList.Add(m_opaqueRenderPass);
             
-            SetupRenderPass(context, ref renderingData);
+            // 天空球Pass
+            var isSkyboxRenderPass = m_skyboxRenderPass.Setup(context,ref renderingData);
+            if (isSkyboxRenderPass)
+                renderPassList.Add(m_skyboxRenderPass);
+            
+            // 半透明Pass
+            var isTransparentRenderPass = m_transparentRenderPass.Setup(context,ref renderingData);
+            if (isTransparentRenderPass)
+                renderPassList.Add(m_transparentRenderPass);
             
         }
 
-        void SetupRenderPass(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            if (renderPassList.Count != 0)
-            {
-                for (int i = 0; i < renderPassList.Count; ++i)
-                {
-                    if (renderPassList[i] != null)
-                        renderPassList[i].Setup(context, ref renderingData);
-                }
-            }
-        }
 
         public override void SetupLights(ScriptableRenderContext context, ref RenderingData renderingData)
         {
@@ -54,10 +45,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             m_ForwardLights.SetupLights(cmd, motoyincLabRenderingData, cameraData, lightData);
         }
 
-        // public override void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData)
-        // {
-        //     cullingParameters.shadowDistance = cameraData.maxShadowDistance;
-        // }
+        public override void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData) 
+        {
+            cullingParameters.shadowDistance = cameraData.maxShadowDistance; 
+        }
     }
     
 }

@@ -30,7 +30,6 @@ namespace UnityEngine.Rendering.MotoyincLab
                 {
                     if (m_RenderPassList[i] != null)
                     {
-                        m_RenderPassList[i].Dispose();
                         m_RenderPassList[i] = null;
                     }
                 }
@@ -91,6 +90,13 @@ namespace UnityEngine.Rendering.MotoyincLab
             renderPass.Execute(context, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
+            
+            // 完成渲染Pass
+            if (renderPass.FinishExecute(context, ref renderingData))
+            {
+                context.ExecuteCommandBuffer(cmd);
+                cmd.Clear();
+            }
         }
 
     }

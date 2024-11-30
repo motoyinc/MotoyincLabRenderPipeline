@@ -53,6 +53,12 @@ namespace UnityEngine.Rendering.MotoyincLab
             var renderer = GetRenderer(camera, additionalCameraData);
             var settings = asset;
             
+            // 联级阴影距离
+            bool anyShadowsSupports = settings.lightSettings.supportsAdditionalLightShadows || settings.lightSettings.supportsMainLightShadows;
+            if (anyShadowsSupports && settings.shadowSettings.maxDistance >= camera.nearClipPlane)
+                cameraData.maxShadowDistance = Mathf.Min(settings.shadowSettings.maxDistance, camera.farClipPlane);
+            else
+                cameraData.maxShadowDistance = 0.0f;
             
             // 相机背景色
             var backgroundColorSRGB = camera.backgroundColor;

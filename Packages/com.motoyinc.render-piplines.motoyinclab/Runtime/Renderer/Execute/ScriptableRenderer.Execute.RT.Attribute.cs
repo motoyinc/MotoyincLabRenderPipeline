@@ -37,6 +37,7 @@
                 m_ActiveColorAttachments[i] = null;
             for (int i = 0; i < m_ActiveColorAttachments.Length; ++i)
                 m_ActiveColorAttachmentIDs[i] = m_ActiveColorAttachments[i]?.nameID ?? 0;
+            m_ActiveDepthAttachment = null;
             m_ActiveDepthAttachment = k_CameraTarget;
             m_FirstTimeCameraColorTargetIsBound = cameraType == CameraRenderType.Base;
             m_FirstTimeCameraDepthTargetIsBound = true;

@@ -54,7 +54,7 @@ Light GetAdditionalLight (int index, float3 positionWS) {
     return light;
 }
 
-Light GetDirectionalLight () {
+Light GetMainLight () {
     Light light;
     light.color = _MainLightColor.rgb;
     light.direction = normalize(_MainLightPosition.xyz);

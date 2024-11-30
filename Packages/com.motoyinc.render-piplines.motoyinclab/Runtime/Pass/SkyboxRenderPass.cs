@@ -5,10 +5,10 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public class SkyboxRenderPass: ScriptableRenderPass
     {
-        public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override bool Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             passName = "SkyboxRenderPass";
-            
+            return true;
         }
         
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -24,12 +24,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             
              if (camera.clearFlags == CameraClearFlags.Skybox && RenderSettings.skybox != null)
              {
-                 context.DrawSkybox(camera);
+                 var skyRendererList = context.CreateSkyboxRendererList(cameraData.camera);
+                 cmd.DrawRendererList(skyRendererList);
              }
 
             cmd.EndSample(passName);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
         }
     }
 }

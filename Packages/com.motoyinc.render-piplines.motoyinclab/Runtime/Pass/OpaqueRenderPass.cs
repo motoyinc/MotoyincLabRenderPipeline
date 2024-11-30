@@ -5,10 +5,10 @@ namespace UnityEngine.Rendering.MotoyincLab
 {
     public class OpaqueRenderPass: ScriptableRenderPass
     {
-        public override void Setup(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override bool Setup(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             passName = "OpaqueRenderPass";
-            
+            return true;
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
@@ -43,15 +43,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.DrawRendererList(rendererList);
             
             cmd.EndSample(passName);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
             
 #if UNITY_EDITOR 
             DrawUnsupportedShaders(context, cullingResults, cmd, camera);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
 #endif
-            
         }
         
 #if UNITY_EDITOR     

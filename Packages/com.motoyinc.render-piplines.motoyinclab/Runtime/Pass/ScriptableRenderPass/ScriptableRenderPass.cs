@@ -10,9 +10,14 @@ namespace UnityEngine.Rendering.MotoyincLab
             set => m_PassName = value;
         }
         
-        public abstract void Setup(ScriptableRenderContext context, ref RenderingData renderingData);
+        public abstract bool Setup(ScriptableRenderContext context, ref RenderingData renderingData);
         
         public abstract void Execute(ScriptableRenderContext context, ref RenderingData renderingData);
+
+        public virtual bool FinishExecute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            return false;
+        }
 
         public virtual void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor) { }
         

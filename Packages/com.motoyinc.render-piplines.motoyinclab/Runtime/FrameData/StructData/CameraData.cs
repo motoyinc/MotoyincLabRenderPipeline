@@ -9,5 +9,6 @@
             this.frameData = frameData;
         }
         
+        public ref float maxShadowDistance => ref frameData.Get<MotoyincLabCameraData>().maxShadowDistance;
     }
 }

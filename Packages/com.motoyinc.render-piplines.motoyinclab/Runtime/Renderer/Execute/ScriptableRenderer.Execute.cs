@@ -8,6 +8,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         public abstract void Setup(ScriptableRenderContext context, ref RenderingData renderingData);
         
         public virtual void SetupLights(ScriptableRenderContext context, ref RenderingData renderingData) { }
+        
+        public virtual void SetupCullingParameters(ref ScriptableCullingParameters cullingParameters, ref CameraData cameraData) { }
 
         public void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {

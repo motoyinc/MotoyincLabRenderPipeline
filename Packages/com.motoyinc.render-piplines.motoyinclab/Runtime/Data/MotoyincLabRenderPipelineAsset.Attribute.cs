@@ -54,6 +54,10 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] bool m_SupportsDynamicBatching = false;
         
         // Lighting setting
+        [SerializeField] LightSettings m_lightSettings = default;
+        
+        // Shadow
+        [SerializeField] private ShadowSettings m_shadowSettings = default;
 
 #if UNITY_EDITOR
         // Debug mode
@@ -84,6 +88,16 @@ namespace UnityEngine.Rendering.MotoyincLab
             set => m_SupportsDynamicBatching = value;
         }
         
+        
+        public LightSettings lightSettings
+        {
+            get => m_lightSettings;
+        }
+
+        public ShadowSettings shadowSettings
+        {
+            get => m_shadowSettings;
+        }
         
         public HDRColorBufferPrecision hdrColorBufferPrecision
         {
