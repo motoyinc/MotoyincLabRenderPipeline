@@ -43,15 +43,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.DrawRendererList(rendererList);
             
             cmd.EndSample(passName);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
             
 #if UNITY_EDITOR 
             DrawUnsupportedShaders(context, cullingResults, cmd, camera);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
 #endif
-            
         }
         
 #if UNITY_EDITOR     

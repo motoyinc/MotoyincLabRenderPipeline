@@ -39,8 +39,6 @@ namespace UnityEngine.Rendering.MotoyincLab
 
             
             cmd.EndSample(passName);
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
         }
     }
 }
