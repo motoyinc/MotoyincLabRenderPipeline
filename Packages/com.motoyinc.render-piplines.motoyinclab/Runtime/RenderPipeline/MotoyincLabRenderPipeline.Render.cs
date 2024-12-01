@@ -36,7 +36,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                     var camera = cameras[i];
                     
                     // 打开动态分辨率
-                    RTHandles.SetHardwareDynamicResolutionState(true);
+                    // RTHandles.SetHardwareDynamicResolutionState(true);
                     
                     // 判断摄像机是否存在 如果不存在直接抛出异常
                     if (camera == null)
@@ -59,6 +59,8 @@ namespace UnityEngine.Rendering.MotoyincLab
                     }
                     
                 }
+                // 释放不活跃RT
+                // s_RTHandlePool.PurgeUnusedResources(Time.frameCount);
             }
             
         }

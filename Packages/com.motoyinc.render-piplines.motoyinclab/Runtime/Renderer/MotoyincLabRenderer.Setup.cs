@@ -16,6 +16,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             // 配置默认RT
             ConfigureCameraTarget(k_CameraTarget, k_CameraTarget);
             
+            // 主光阴影Pass
+            var isShadowsPass = m_mainLightShadowCasterPass.Setup(context,ref renderingData);
+            if (isShadowsPass)
+                renderPassList.Add(m_mainLightShadowCasterPass);
             
             // 不透明Pass
             var isOpaqueRenderPass = m_opaqueRenderPass.Setup(context,ref renderingData);

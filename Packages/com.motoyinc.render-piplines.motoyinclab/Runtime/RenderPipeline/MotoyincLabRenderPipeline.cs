@@ -21,6 +21,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         private readonly MotoyincLabRenderPipelineAsset pipelineAsset;
         
         private MotoyincLabRenderPipelineGlobalSettings m_GlobalSettings;
+        // internal static RTHandleResourcePool s_RTHandlePool;
         
         // 内置资产
         internal MotoyincLabRenderPipelineRuntimeTextures runtimeTextures { get; private set; }
@@ -44,6 +45,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             // Blitter.Initialize(shader.coreBlitPS, shader.coreBlitColorAndDepthPS);
             RTHandles.Initialize(Screen.width, Screen.height);
+            ShaderGlobalKeywords.InitializeShaderGlobalKeywords();
             
             // 支持渲染特性
             SupportedRenderingFeatures.active.supportsHDR = pipelineAsset.supportsHDR;
@@ -51,8 +53,17 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             // SRP合批功能
             GraphicsSettings.useScriptableRenderPipelineBatching = pipelineAsset.useSRPBatcher;
+            
+            // 初始化RT池
+            // s_RTHandlePool = new RTHandleResourcePool();
 
         }
+
+        // protected override void Dispose(bool disposing)
+        // {
+        //     s_RTHandlePool.Cleanup();
+        //     s_RTHandlePool = null;
+        // }
     }
 }
 

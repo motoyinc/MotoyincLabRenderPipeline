@@ -8,6 +8,7 @@
         public bool supportsMainLightShadows;           // 支持主光阴影
         public bool supportsAdditionalLightShadows;     // 支持附加光阴影
         public int mainLightShadowCascadesCount;        // 联级 联级数量
+        public Vector3 mainLightShadowCascadesSplit;    // 联级分割比
         
         // 主光信息
         internal bool mainLightShadowsEnabled;          // 开启阴影
@@ -31,6 +32,7 @@
             supportsMainLightShadows = false;
             supportsAdditionalLightShadows = false;
             mainLightShadowCascadesCount = 0;
+            mainLightShadowCascadesSplit = Vector3.zero;
             
             mainLightShadowsEnabled = false;
             mainLightShadowResolution = 0;

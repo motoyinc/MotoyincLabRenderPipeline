@@ -10,7 +10,7 @@
     {
         private RenderingMode m_RenderingMode;
         ForwardLights m_ForwardLights;
-        
+        private MainLightShadowCasterPass m_mainLightShadowCasterPass;
         private OpaqueRenderPass m_opaqueRenderPass;
         private SkyboxRenderPass m_skyboxRenderPass;
         private TransparentRenderPass m_transparentRenderPass;
@@ -22,6 +22,7 @@
             // 创建灯光对象
             m_ForwardLights = new ForwardLights();
             
+            m_mainLightShadowCasterPass = new MainLightShadowCasterPass();
             m_opaqueRenderPass = new OpaqueRenderPass();
             m_skyboxRenderPass = new SkyboxRenderPass();
             m_transparentRenderPass = new TransparentRenderPass();
@@ -51,6 +52,10 @@
         internal override void ReleaseRenderTargets()
         {
             base.ReleaseRenderTargets();
+            m_mainLightShadowCasterPass?.Dispose();
+            m_opaqueRenderPass?.Dispose();
+            m_skyboxRenderPass?.Dispose();
+            m_transparentRenderPass?.Dispose();
         }
     }
 }
