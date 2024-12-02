@@ -17,23 +17,23 @@ namespace UnityEngine.Rendering.MotoyincLab
             ConfigureCameraTarget(k_CameraTarget, k_CameraTarget);
             
             // 主光阴影Pass
-            var isShadowsPass = m_mainLightShadowCasterPass.Setup(context,ref renderingData);
-            if (isShadowsPass)
+            var isEnableShadowsPass = m_mainLightShadowCasterPass.Setup(context,ref renderingData);
+            if (isEnableShadowsPass)
                 renderPassList.Add(m_mainLightShadowCasterPass);
             
             // 不透明Pass
-            var isOpaqueRenderPass = m_opaqueRenderPass.Setup(context,ref renderingData);
-            if (isOpaqueRenderPass)
+            var isEnableOpaqueRenderPass = m_opaqueRenderPass.Setup(context,ref renderingData);
+            if (isEnableOpaqueRenderPass)
                 renderPassList.Add(m_opaqueRenderPass);
             
             // 天空球Pass
-            var isSkyboxRenderPass = m_skyboxRenderPass.Setup(context,ref renderingData);
-            if (isSkyboxRenderPass)
+            var isEnableSkyboxRenderPass = m_skyboxRenderPass.Setup(context,ref renderingData);
+            if (isEnableSkyboxRenderPass)
                 renderPassList.Add(m_skyboxRenderPass);
             
             // 半透明Pass
-            var isTransparentRenderPass = m_transparentRenderPass.Setup(context,ref renderingData);
-            if (isTransparentRenderPass)
+            var isEnableTransparentRenderPass = m_transparentRenderPass.Setup(context,ref renderingData);
+            if (isEnableTransparentRenderPass)
                 renderPassList.Add(m_transparentRenderPass);
             
         }
