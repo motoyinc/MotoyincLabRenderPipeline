@@ -1,12 +1,14 @@
-﻿using Unity.Mathematics;
+﻿using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine.Experimental.Rendering;
 namespace UnityEngine.Rendering.MotoyincLab
 {
     public class MainLightShadowCasterPass: ScriptableRenderPass
     {
-        private static class MainLightShadowConstantBuffer
+        public static class MainLightShadowConstantBuffer
         {
             public static readonly int _MainLightShadowmapID = Shader.PropertyToID(k_MainLightShadowMapTextureName);
+            public static readonly int _WorldToShadow = Shader.PropertyToID("_MainLightWorldToShadow");
         }
         private const string k_MainLightShadowMapTextureName = "_MainLightShadowmapTexture";
         private const int k_MaxCascades = 4;                // 最大联级数量
@@ -160,6 +162,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 
                 // -------------收集阴影信息-------------
                 // 向GPU发送阴影数据
+                SetupMainLightShadowDataConstants(cmd, ref m_PassData);
                 
                 // 将阴影RT所为Tex输入
                 cmd.SetGlobalTexture(MainLightShadowConstantBuffer._MainLightShadowmapID, m_MainLightShadowmapTexture.nameID);
@@ -222,6 +225,30 @@ namespace UnityEngine.Rendering.MotoyincLab
                 m_CascadeSlices[i].splitData = splitData;                           // 分割数据
             }
         }
+        
+        // 收集 阴影相关数据
+        void SetupMainLightShadowDataConstants(CommandBuffer cmd, ref PassData data)
+        {
+            
+            // ///【阴影矩阵】/// //
+            int cascadeCounts = m_ShadowCasterCascadesCount;
+            for (int i = 0; i < cascadeCounts; ++i)
+            {
+                m_CascadeSlices[i].shadowTransform
+                    = ShadowUtils.GetDirectionalLightMatrix(ref m_CascadeSlices[i], cascadeCounts, renderTargetWidth, renderTargetHeight);
+                m_MainLightShadowMatrices[i]=m_CascadeSlices[i].shadowTransform;
+            }
+            // 填充空余矩阵
+            Matrix4x4 noOpShadowMatrix = Matrix4x4.zero;
+            noOpShadowMatrix.m22 = (SystemInfo.usesReversedZBuffer) ? 1.0f : 0.0f;
+            for (int i = cascadeCounts; i <= k_MaxCascades; ++i)
+            {
+                m_MainLightShadowMatrices[i] = noOpShadowMatrix;
+            }
+            cmd.SetGlobalMatrixArray(MainLightShadowConstantBuffer._WorldToShadow, m_MainLightShadowMatrices);
+            
+        }
+
         
     }
 }

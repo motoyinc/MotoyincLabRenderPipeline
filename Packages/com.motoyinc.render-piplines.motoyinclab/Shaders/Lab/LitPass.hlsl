@@ -47,9 +47,11 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     SurfaceData surface;
     UNITY_SETUP_INSTANCE_ID(input);
     float baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.baseUV);
+    
     float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
     
     // 采集几何信息
+    surface.position = input.positionWS;
     surface.color = baseMap * baseColor;
     surface.normal = normalize(input.normalWS);
     surface.alpha = baseColor.a;

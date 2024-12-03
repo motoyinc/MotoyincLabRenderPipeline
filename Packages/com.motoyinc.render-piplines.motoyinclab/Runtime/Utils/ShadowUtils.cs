@@ -1,4 +1,6 @@
 ﻿using UnityEngine.Rendering.RenderGraphModule;
+using System.Collections.Generic;
+using UnityEngine.Experimental.Rendering;
 namespace UnityEngine.Rendering.MotoyincLab
 {
     
@@ -49,10 +51,40 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.SetViewport(new Rect(shadowSliceData.offsetX, shadowSliceData.offsetY, shadowSliceData.resolution, shadowSliceData.resolution));
             // 设置视角矩阵和投影矩阵
             cmd.SetViewProjectionMatrices(shadowSliceData.viewMatrix, shadowSliceData.projectionMatrix);
-            
+            cmd.SetGlobalDepthBias(1.0f, 2.5f); 
             //提交渲染
             if(rendererList.isValid)
                 cmd.DrawRendererList(rendererList);
+            cmd.SetGlobalDepthBias(0.0f, 0.0f);
+        }
+        
+        public static Matrix4x4 GetDirectionalLightMatrix(ref ShadowSliceData shadowSliceData, int cascadeCounts, int atlasWidth, int atlasHeight)
+        {
+            Matrix4x4 view = shadowSliceData.viewMatrix;
+            Matrix4x4 proj = shadowSliceData.projectionMatrix;
+            if (SystemInfo.usesReversedZBuffer)
+            {
+                proj.m20 = -proj.m20;
+                proj.m21 = -proj.m21;
+                proj.m22 = -proj.m22;
+                proj.m23 = -proj.m23;
+            }
+
+            
+            Matrix4x4 worldToShadow = proj * view;
+            
+            // [-1,1] to [0,1]
+            var textureScaleAndBias = Matrix4x4.identity;
+            textureScaleAndBias.m00 = 0.5f;
+            textureScaleAndBias.m11 = 0.5f;
+            textureScaleAndBias.m22 = 0.5f;
+            textureScaleAndBias.m03 = 0.5f;
+            textureScaleAndBias.m23 = 0.5f;
+            textureScaleAndBias.m13 = 0.5f;
+            Matrix4x4 shadowTransform = textureScaleAndBias * worldToShadow;
+            
+
+            return shadowTransform;
         }
         
         
