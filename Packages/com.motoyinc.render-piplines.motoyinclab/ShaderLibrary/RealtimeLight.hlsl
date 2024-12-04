@@ -2,6 +2,8 @@
 #define MLABRP_LIGHT_INCLUDED
 
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Common.hlsl"
+#include  "Input.hlsl"
+
 #define MAX_ADDITIONAL_LIGHT_COUNT 4
 
 CBUFFER_START(_CustomLight)
@@ -24,15 +26,15 @@ int GetAdditionalLightCount () {
     return _AdditionalLightsCount.x;
 }
 
-Light GetAdditionalLight (int index, float3 positionWS) {
+Light GetAdditionalLight (int index, InputData inputData) {
     Light light;
     float4 lightPositionWS = _AdditionalLightsPosition[index];
     float3 color = _AdditionalLightsColor[index].rgb;
     float lightType = lightPositionWS.w;
     
     // 计算光的照射方向
-    light.direction = normalize(lightPositionWS.xyz - positionWS * lightType);
-    light.distance = length(lightPositionWS.xyz - positionWS);
+    light.direction = normalize(lightPositionWS.xyz - inputData.positionWS * lightType);
+    light.distance = length(lightPositionWS.xyz - inputData.positionWS);
 
     // 计算光线衰减
     float distanceSqr = max(light.distance * light.distance, 0.000001);    // Distance^2

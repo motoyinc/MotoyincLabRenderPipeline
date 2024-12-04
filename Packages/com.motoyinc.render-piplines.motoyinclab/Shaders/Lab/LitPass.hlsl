@@ -3,6 +3,8 @@
 
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Common.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/SurfaceData.hlsl"
+#include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Input.hlsl"
+#include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Shadows.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/RealtimeLight.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Lighting.hlsl"
 
@@ -14,6 +16,7 @@ struct Attributes {
 };
 struct Varyings {
     float4 positionCS : SV_POSITION;
+    float4 shadowCoord : VAR_SHADOW_UV;
     float3 positionWS : VAR_POSITION_WS;
     float3 normalWS : VAR_NORMAL;
     float2 baseUV : VAR_BASE_UV;
@@ -39,6 +42,7 @@ Varyings LitPassVertex (Attributes input){
     output.normalWS = TransformObjectToWorldNormal(input.normalOS);
     float4 baseST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
     output.baseUV = input.baseUV * baseST.xy + baseST.zw;
+    output.shadowCoord = TransformWorldToShadowCoord(output.positionWS);
     return output;
 }
 
@@ -51,17 +55,23 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
     
     // 采集几何信息
-    surface.position = input.positionWS;
     surface.color = baseMap * baseColor;
-    surface.normal = normalize(input.normalWS);
     surface.alpha = baseColor.a;
-    surface.viewDirection = normalize(_WorldSpaceCameraPos - input.positionWS);
     surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
     surface.roughness =UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Roughness);
 
+    //环境数据信息收集
+    InputData inputData;
+    inputData.positionWS = input.positionWS;
+    inputData.positionCS = input.positionCS;
+    inputData.normalWS = normalize(input.normalWS);
+    inputData.viewDirectionWS = normalize(_WorldSpaceCameraPos - input.positionWS);
+    inputData.shadowCoord = input.shadowCoord;
+    inputData.shadowMask = 0.0f;
+    
     //计算光照颜色
     BRDFData brdf = GetBRDF(surface);
-    float3 color = GetLighting(surface, brdf, input.positionWS);
+    float3 color = GetLighting(surface, brdf, inputData);
     
     #if defined(_CLIPPING)
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
