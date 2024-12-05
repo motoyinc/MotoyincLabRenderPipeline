@@ -9,6 +9,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField][Range(0.0f,1.0f)] float m_Cascade2Split = 0.25f;
         [SerializeField] Vector2 m_Cascade3Split = new Vector2(0.1f, 0.3f);
         [SerializeField] Vector3 m_Cascade4Split = new Vector3(0.067f, 0.2f, 0.467f);
+        [SerializeField][Range(0.0f,1.0f)] float m_CascadeBorder = 0.2f;
         
         [SerializeField] ShadowResolution m_MainLightShadowmapResolution = ShadowResolution._1024;
         
@@ -55,7 +56,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             get => m_Cascade4Split;
             set => m_Cascade4Split = value;
         }
-
+        public float cascadeBorder
+        {
+            get => m_CascadeBorder;
+            set => m_CascadeBorder = value;
+        }
         
     }
     

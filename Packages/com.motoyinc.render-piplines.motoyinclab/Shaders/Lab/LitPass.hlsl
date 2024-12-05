@@ -71,7 +71,7 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     
     //计算光照颜色
     BRDFData brdf = GetBRDF(surface);
-    float3 color = GetLighting(surface, brdf, inputData);
+    float3 color = GetLighting(inputData, brdf);
     
     #if defined(_CLIPPING)
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));

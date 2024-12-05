@@ -21,7 +21,7 @@ float3 LightingLambert(InputData inputData, Light light) {
     float3 diffuse = dot(inputData.normalWS, light.direction);
     diffuse = max(0.0, diffuse);  // 0 ~ ∞
     //diffuse = saturate(diffuse);  // 0 ~ 1
-    return diffuse * light.color;
+    return diffuse * light.color * light.shadowAttenuation;
 }
 
 float3 GetLighting(InputData inputData, BRDFData brdf, Light light)
@@ -30,10 +30,10 @@ float3 GetLighting(InputData inputData, BRDFData brdf, Light light)
     return diffuseIntensity * DirectBRDF(inputData, brdf, light);
 }
 
-float3 GetLighting (SurfaceData surface, BRDFData brdf, InputData inputData) {
+float3 GetLighting (InputData inputData, BRDFData brdf) {
     float3 color = 0.0;
     // 计算直射光
-    color = GetLighting(inputData, brdf, GetMainLight());
+    color = GetLighting(inputData, brdf, GetMainLight(inputData));
     
     // 累计计算附加光
     for(int i = 0 ; i< GetAdditionalLightCount(); ++i)

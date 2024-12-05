@@ -88,6 +88,22 @@ namespace UnityEngine.Rendering.MotoyincLab
         }
         
         
+        internal static void GetScaleAndBiasForLinearDistanceFade(float fadeDistance, float kBorder, out float scale, out float bias)
+        {
+            if (kBorder < 0.0001f)
+            {
+                scale = 1000f;
+                bias = -fadeDistance * 1000f;
+                return;
+            }
+            
+            kBorder = 1 - kBorder;
+            kBorder *= kBorder;
+            
+            float distanceFadeNear = kBorder * fadeDistance;
+            scale = 1.0f / (fadeDistance - distanceFadeNear);
+            bias = -distanceFadeNear / (fadeDistance - distanceFadeNear);
+        }
         
         
         

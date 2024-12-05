@@ -9,6 +9,7 @@
         public bool supportsAdditionalLightShadows;     // 支持附加光阴影
         public int mainLightShadowCascadesCount;        // 联级 联级数量
         public Vector3 mainLightShadowCascadesSplit;    // 联级分割比
+        public float mainLightShadowCascadeBorder;      // 最后一个联级淡出（宽度为0~1，为0是会关闭 shadow fade）
         
         // 主光信息
         internal bool mainLightShadowsEnabled;          // 开启阴影

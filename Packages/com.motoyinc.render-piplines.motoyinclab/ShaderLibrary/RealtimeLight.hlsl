@@ -3,6 +3,7 @@
 
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Common.hlsl"
 #include  "Input.hlsl"
+#include "Shadows.hlsl"
 
 #define MAX_ADDITIONAL_LIGHT_COUNT 4
 
@@ -20,6 +21,7 @@ struct Light {
     float3 color;
     float3 direction;
     float distance;
+    float shadowAttenuation;
 };
 
 int GetAdditionalLightCount () {
@@ -53,14 +55,16 @@ Light GetAdditionalLight (int index, InputData inputData) {
 
     // 区分直射光和非直射光Color
     light.color = color*((1-lightType) +  Attenuation * spotAttenuation* lightType);
+    light.shadowAttenuation = 1;
     return light;
 }
 
-Light GetMainLight () {
+Light GetMainLight (InputData inputData) {
     Light light;
     light.color = _MainLightColor.rgb;
     light.direction = normalize(_MainLightPosition.xyz);
     light.distance = 0.0;
+    light.shadowAttenuation = MainLightShadow(inputData.shadowCoord, inputData.positionWS);
     return light;
 }
 
@@ -69,6 +73,7 @@ Light _DEUBG_GetDirectionalLight() {
     light.color = 1.0;
     light.direction = normalize(float3(1.0, 1.0, 0.0));
     light.distance = 0.0;
+    light.shadowAttenuation = 1;
     return light;
 }
 

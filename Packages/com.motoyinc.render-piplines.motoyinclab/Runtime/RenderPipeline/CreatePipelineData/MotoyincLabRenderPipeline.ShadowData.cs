@@ -10,8 +10,12 @@
             // 初始化RT大小（并非RT大小）
             shadowData.mainLightShadowmapHeight = settings.shadowSettings.mainLightShadowmapResolution;
             shadowData.mainLightShadowmapWidth = settings.shadowSettings.mainLightShadowmapResolution;
+            
+            // 初始化联级属性
             shadowData.mainLightShadowCascadesCount = settings.shadowSettings.shadowCascadeCount;
             shadowData.mainLightShadowCascadesSplit = GetMainLightCascadeSplit(shadowData.mainLightShadowCascadesCount, settings);
+            shadowData.mainLightShadowCascadeBorder = settings.shadowSettings.cascadeBorder;
+            
             
             // 这部分内容是在Pass内做的，这里只先进行初始化
             shadowData.isKeywordAdditionalLightShadowsEnabled = false;

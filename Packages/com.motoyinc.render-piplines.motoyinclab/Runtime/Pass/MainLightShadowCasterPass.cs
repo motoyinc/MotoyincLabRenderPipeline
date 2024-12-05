@@ -9,6 +9,9 @@ namespace UnityEngine.Rendering.MotoyincLab
         {
             public static readonly int _MainLightShadowmapID = Shader.PropertyToID(k_MainLightShadowMapTextureName);
             public static readonly int _WorldToShadow = Shader.PropertyToID("_MainLightWorldToShadow");
+            public static readonly int _ShadowParams = Shader.PropertyToID("_MainLightShadowParams");
+            
+            
         }
         private const string k_MainLightShadowMapTextureName = "_MainLightShadowmapTexture";
         private const int k_MaxCascades = 4;                // 最大联级数量
@@ -19,6 +22,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         private int shadowResolution;                       // 单个联级大小
         private Vector3 m_ratios;                           // 联级阴影比例
         private int m_ShadowCasterCascadesCount;            // 联级阴影数量
+        private float m_CascadeBorder;
+        private float m_MaxShadowDistanceSq;
         
         private Matrix4x4[] m_MainLightShadowMatrices;      // 投影矩阵
         private ShadowSliceData[] m_CascadeSlices;          // 综合Shadow数据
@@ -122,7 +127,8 @@ namespace UnityEngine.Rendering.MotoyincLab
                 name: k_MainLightShadowMapTextureName
             );
             // ShadowUtils.ShadowRTReAllocateIfNeeded(ref m_MainLightShadowmapTexture, renderTargetWidth, renderTargetHeight, k_ShadowmapBufferBits, name: k_MainLightShadowMapTextureName);
-
+            m_CascadeBorder = shadowData.mainLightShadowCascadeBorder;
+            m_MaxShadowDistanceSq = cameraData.maxShadowDistance * cameraData.maxShadowDistance;
             // 启用Pass
             return true;
         }
@@ -229,6 +235,18 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 收集 阴影相关数据
         void SetupMainLightShadowDataConstants(CommandBuffer cmd, ref PassData data)
         {
+            var lightData = data.lightData;
+            var shadowLightIndex = lightData.mainLightIndex;
+            if (shadowLightIndex == -1)
+                return;
+            VisibleLight shadowLight = lightData.visibleLights[shadowLightIndex];
+            
+            // ///【阴影数据】/// //
+            // x: 阴影强度[v]， y: 软阴影[x]， z：阴影淡化的范围[x]， w:阴影淡化偏移值[x]
+            ShadowUtils.GetScaleAndBiasForLinearDistanceFade(m_MaxShadowDistanceSq, m_CascadeBorder, out float shadowFadeScale, out float shadowFadeBias);
+            Vector4 shadowDataBuffer = new Vector4(shadowLight.light.shadowStrength, 0.0f, shadowFadeScale, shadowFadeBias);
+            cmd.SetGlobalVector(MainLightShadowConstantBuffer._ShadowParams, shadowDataBuffer);
+            
             
             // ///【阴影矩阵】/// //
             int cascadeCounts = m_ShadowCasterCascadesCount;
@@ -247,6 +265,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             }
             cmd.SetGlobalMatrixArray(MainLightShadowConstantBuffer._WorldToShadow, m_MainLightShadowMatrices);
             
+            
+            // ///【其他数据】/// //
+            cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, data.cameraData.worldSpaceCameraPos);
         }
 
         
