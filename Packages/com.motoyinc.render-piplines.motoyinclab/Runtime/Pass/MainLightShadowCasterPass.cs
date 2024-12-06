@@ -11,7 +11,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             public static readonly int _WorldToShadow = Shader.PropertyToID("_MainLightWorldToShadow");
             public static readonly int _ShadowParams = Shader.PropertyToID("_MainLightShadowParams");
             
-            
+            public static readonly int _CascadeShadowSplitSpheres0 = Shader.PropertyToID("_CascadeShadowSplitSpheres0");
+            public static readonly int _CascadeShadowSplitSpheres1 = Shader.PropertyToID("_CascadeShadowSplitSpheres1");
+            public static readonly int _CascadeShadowSplitSpheres2 = Shader.PropertyToID("_CascadeShadowSplitSpheres2");
+            public static readonly int _CascadeShadowSplitSpheres3 = Shader.PropertyToID("_CascadeShadowSplitSpheres3");
+            public static readonly int _CascadeShadowSplitSphereRadii = Shader.PropertyToID("_CascadeShadowSplitSphereRadii");
         }
         private const string k_MainLightShadowMapTextureName = "_MainLightShadowmapTexture";
         private const int k_MaxCascades = 4;                // 最大联级数量
@@ -20,11 +24,13 @@ namespace UnityEngine.Rendering.MotoyincLab
         private int renderTargetWidth;                      // 阴影贴图宽度
         private int renderTargetHeight;                     // 阴影贴图高度
         private int shadowResolution;                       // 单个联级大小
-        private Vector3 m_ratios;                           // 联级阴影比例
+        
         private int m_ShadowCasterCascadesCount;            // 联级阴影数量
         private float m_CascadeBorder;
         private float m_MaxShadowDistanceSq;
         
+        private Vector3 m_ratios;                                               // 联级阴影分割比例
+        private Vector4[] m_CascadeSplitDistances = new Vector4[k_MaxCascades]; // 联级阴影裁切球      .xyz:起始点  .w:距离
         private Matrix4x4[] m_MainLightShadowMatrices;      // 投影矩阵
         private ShadowSliceData[] m_CascadeSlices;          // 综合Shadow数据
         
@@ -252,9 +258,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             int cascadeCounts = m_ShadowCasterCascadesCount;
             for (int i = 0; i < cascadeCounts; ++i)
             {
-                m_CascadeSlices[i].shadowTransform
-                    = ShadowUtils.GetDirectionalLightMatrix(ref m_CascadeSlices[i], cascadeCounts, renderTargetWidth, renderTargetHeight);
+                ShadowUtils.GetDirectionalLightMatrix(ref m_CascadeSlices[i], cascadeCounts, renderTargetWidth, renderTargetHeight);
+                
                 m_MainLightShadowMatrices[i]=m_CascadeSlices[i].shadowTransform;
+                m_CascadeSplitDistances[i]=m_CascadeSlices[i].splitData.cullingSphere;
             }
             // 填充空余矩阵
             Matrix4x4 noOpShadowMatrix = Matrix4x4.zero;
@@ -263,11 +270,33 @@ namespace UnityEngine.Rendering.MotoyincLab
             {
                 m_MainLightShadowMatrices[i] = noOpShadowMatrix;
             }
+            
             cmd.SetGlobalMatrixArray(MainLightShadowConstantBuffer._WorldToShadow, m_MainLightShadowMatrices);
             
+    
+            
+            // ///【Caster信息】/// //
+            if (m_ShadowCasterCascadesCount > 1)
+            {
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._CascadeShadowSplitSpheres0,
+                    m_CascadeSplitDistances[0]);
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._CascadeShadowSplitSpheres1,
+                    m_CascadeSplitDistances[1]);
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._CascadeShadowSplitSpheres2,
+                    m_CascadeSplitDistances[2]);
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._CascadeShadowSplitSpheres3,
+                    m_CascadeSplitDistances[3]);
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._CascadeShadowSplitSphereRadii, new Vector4(
+                    m_CascadeSplitDistances[0].w * m_CascadeSplitDistances[0].w,
+                    m_CascadeSplitDistances[1].w * m_CascadeSplitDistances[1].w,
+                    m_CascadeSplitDistances[2].w * m_CascadeSplitDistances[2].w,
+                    m_CascadeSplitDistances[3].w * m_CascadeSplitDistances[3].w));
+            }
             
             // ///【其他数据】/// //
             cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, data.cameraData.worldSpaceCameraPos);
+            cmd.SetKeyword(ShaderGlobalKeywords.MainLightShadows, data.shadowData.mainLightShadowCascadesCount == 1);
+            cmd.SetKeyword(ShaderGlobalKeywords.MainLightShadowCascades, data.shadowData.mainLightShadowCascadesCount > 1);
         }
 
         

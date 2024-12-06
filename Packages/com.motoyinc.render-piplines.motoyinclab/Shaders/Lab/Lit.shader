@@ -23,7 +23,10 @@
             HLSLPROGRAM
             #pragma multi_compile_instancing
             #pragma shader_feature _CLIPPING
+
+            // Pipeline keywords
             #pragma shader_feature _GLOBAL_DEBUG
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
             

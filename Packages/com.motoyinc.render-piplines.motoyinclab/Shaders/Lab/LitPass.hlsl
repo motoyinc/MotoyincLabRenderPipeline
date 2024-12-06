@@ -16,7 +16,9 @@ struct Attributes {
 };
 struct Varyings {
     float4 positionCS : SV_POSITION;
-    float4 shadowCoord : VAR_SHADOW_UV;
+    #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
+        float4 shadowCoord : VAR_SHADOW_UV;
+    #endif
     float3 positionWS : VAR_POSITION_WS;
     float3 normalWS : VAR_NORMAL;
     float2 baseUV : VAR_BASE_UV;
@@ -42,7 +44,9 @@ Varyings LitPassVertex (Attributes input){
     output.normalWS = TransformObjectToWorldNormal(input.normalOS);
     float4 baseST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
     output.baseUV = input.baseUV * baseST.xy + baseST.zw;
+    #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
     output.shadowCoord = TransformWorldToShadowCoord(output.positionWS);
+    #endif
     return output;
 }
 
@@ -66,7 +70,11 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     inputData.positionCS = input.positionCS;
     inputData.normalWS = normalize(input.normalWS);
     inputData.viewDirectionWS = normalize(_WorldSpaceCameraPos - input.positionWS);
-    inputData.shadowCoord = input.shadowCoord;
+    #ifdef _MAIN_LIGHT_SHADOWS_CASCADE
+        inputData.shadowCoord = TransformWorldToShadowCoord(inputData.positionWS);
+    #else
+        inputData.shadowCoord = input.shadowCoord;
+    #endif
     inputData.shadowMask = 0.0f;
     
     //计算光照颜色
@@ -80,8 +88,13 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     #if defined(_GLOBAL_DEBUG)
     return DebugSurface(surface);
     #endif
-
+    // float4 shadowCoord = TransformWorldToShadowCoord(inputData.positionWS);
+    // float shadowMap = MainLightRealtimeShadow(shadowCoord);
+    // return shadowMap;
+    // return MainLightShadow(inputData.shadowCoord,inputData.positionWS);
     // 输出颜色
+    // return ComputeCascadeIndex(inputData.positionWS);
+    // return inputData.shadowCoord;
     return float4(color,surface.alpha);
 }
 

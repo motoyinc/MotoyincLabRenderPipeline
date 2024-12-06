@@ -58,10 +58,13 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.SetGlobalDepthBias(0.0f, 0.0f);
         }
         
-        public static Matrix4x4 GetDirectionalLightMatrix(ref ShadowSliceData shadowSliceData, int cascadeCounts, int atlasWidth, int atlasHeight)
+        // 获取直射光阴影矩阵
+        public static void GetDirectionalLightMatrix(ref ShadowSliceData shadowSliceData, int cascadeCounts, int atlasWidth, int atlasHeight)
         {
             Matrix4x4 view = shadowSliceData.viewMatrix;
             Matrix4x4 proj = shadowSliceData.projectionMatrix;
+            
+            // 深度反转
             if (SystemInfo.usesReversedZBuffer)
             {
                 proj.m20 = -proj.m20;
@@ -69,11 +72,9 @@ namespace UnityEngine.Rendering.MotoyincLab
                 proj.m22 = -proj.m22;
                 proj.m23 = -proj.m23;
             }
-
-            
             Matrix4x4 worldToShadow = proj * view;
             
-            // [-1,1] to [0,1]
+            // 深度范围调整 [-1,1] to [0,1]
             var textureScaleAndBias = Matrix4x4.identity;
             textureScaleAndBias.m00 = 0.5f;
             textureScaleAndBias.m11 = 0.5f;
@@ -81,13 +82,28 @@ namespace UnityEngine.Rendering.MotoyincLab
             textureScaleAndBias.m03 = 0.5f;
             textureScaleAndBias.m23 = 0.5f;
             textureScaleAndBias.m13 = 0.5f;
-            Matrix4x4 shadowTransform = textureScaleAndBias * worldToShadow;
+            shadowSliceData.shadowTransform = textureScaleAndBias * worldToShadow;
             
-
-            return shadowTransform;
+            // 联级缩放与偏移量
+            if (cascadeCounts > 1)
+                ApplySliceTransform(ref shadowSliceData, atlasWidth, atlasHeight);
         }
         
+        // 联级缩放与偏移量
+        public static void ApplySliceTransform(ref ShadowSliceData shadowSliceData, int atlasWidth, int atlasHeight)
+        {
+            Matrix4x4 sliceTransform = Matrix4x4.identity;
+            float oneOverAtlasWidth = 1.0f / atlasWidth;
+            float oneOverAtlasHeight = 1.0f / atlasHeight;
+            sliceTransform.m00 = shadowSliceData.resolution * oneOverAtlasWidth;
+            sliceTransform.m11 = shadowSliceData.resolution * oneOverAtlasHeight;
+            sliceTransform.m03 = shadowSliceData.offsetX * oneOverAtlasWidth;
+            sliceTransform.m13 = shadowSliceData.offsetY * oneOverAtlasHeight;
+            
+            shadowSliceData.shadowTransform = sliceTransform * shadowSliceData.shadowTransform;
+        }
         
+        // 最远阴影离淡出因子
         internal static void GetScaleAndBiasForLinearDistanceFade(float fadeDistance, float kBorder, out float scale, out float bias)
         {
             if (kBorder < 0.0001f)
@@ -104,8 +120,5 @@ namespace UnityEngine.Rendering.MotoyincLab
             scale = 1.0f / (fadeDistance - distanceFadeNear);
             bias = -distanceFadeNear / (fadeDistance - distanceFadeNear);
         }
-        
-        
-        
     }
 }
