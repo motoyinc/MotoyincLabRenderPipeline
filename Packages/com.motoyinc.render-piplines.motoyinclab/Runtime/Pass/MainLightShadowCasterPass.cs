@@ -268,7 +268,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             noOpShadowMatrix.m22 = (SystemInfo.usesReversedZBuffer) ? 1.0f : 0.0f;
             for (int i = cascadeCounts; i <= k_MaxCascades; ++i)
             {
-                m_MainLightShadowMatrices[i] = noOpShadowMatrix;
+                m_MainLightShadowMatrices[i] = m_MainLightShadowMatrices[cascadeCounts-1];
             }
             
             cmd.SetGlobalMatrixArray(MainLightShadowConstantBuffer._WorldToShadow, m_MainLightShadowMatrices);
