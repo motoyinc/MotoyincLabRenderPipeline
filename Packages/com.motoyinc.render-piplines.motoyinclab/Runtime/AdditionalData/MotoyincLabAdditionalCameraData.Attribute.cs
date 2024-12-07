@@ -130,5 +130,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             return renderers[m_RendererIndex];
         }
 
+        public void OnDestroy()
+        {
+            if (camera.cameraType != CameraType.SceneView)
+                GetRawRenderer()?.ReleaseRenderTargets();
+        }
     }
 }

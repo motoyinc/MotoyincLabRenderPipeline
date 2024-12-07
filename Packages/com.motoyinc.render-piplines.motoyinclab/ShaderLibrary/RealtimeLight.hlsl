@@ -2,6 +2,9 @@
 #define MLABRP_LIGHT_INCLUDED
 
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Common.hlsl"
+#include  "Input.hlsl"
+#include "Shadows.hlsl"
+
 #define MAX_ADDITIONAL_LIGHT_COUNT 4
 
 CBUFFER_START(_CustomLight)
@@ -18,21 +21,22 @@ struct Light {
     float3 color;
     float3 direction;
     float distance;
+    float shadowAttenuation;
 };
 
 int GetAdditionalLightCount () {
     return _AdditionalLightsCount.x;
 }
 
-Light GetAdditionalLight (int index, float3 positionWS) {
+Light GetAdditionalLight (int index, InputData inputData) {
     Light light;
     float4 lightPositionWS = _AdditionalLightsPosition[index];
     float3 color = _AdditionalLightsColor[index].rgb;
     float lightType = lightPositionWS.w;
     
     // 计算光的照射方向
-    light.direction = normalize(lightPositionWS.xyz - positionWS * lightType);
-    light.distance = length(lightPositionWS.xyz - positionWS);
+    light.direction = normalize(lightPositionWS.xyz - inputData.positionWS * lightType);
+    light.distance = length(lightPositionWS.xyz - inputData.positionWS);
 
     // 计算光线衰减
     float distanceSqr = max(light.distance * light.distance, 0.000001);    // Distance^2
@@ -51,14 +55,16 @@ Light GetAdditionalLight (int index, float3 positionWS) {
 
     // 区分直射光和非直射光Color
     light.color = color*((1-lightType) +  Attenuation * spotAttenuation* lightType);
+    light.shadowAttenuation = 1;
     return light;
 }
 
-Light GetMainLight () {
+Light GetMainLight (InputData inputData) {
     Light light;
     light.color = _MainLightColor.rgb;
     light.direction = normalize(_MainLightPosition.xyz);
     light.distance = 0.0;
+    light.shadowAttenuation = MainLightShadow(inputData.shadowCoord, inputData.positionWS);
     return light;
 }
 
@@ -67,6 +73,7 @@ Light _DEUBG_GetDirectionalLight() {
     light.color = 1.0;
     light.direction = normalize(float3(1.0, 1.0, 0.0));
     light.distance = 0.0;
+    light.shadowAttenuation = 1;
     return light;
 }
 

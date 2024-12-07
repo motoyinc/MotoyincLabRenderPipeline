@@ -17,6 +17,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             Camera camera = cameraData.camera;
             var cmd = renderingData.commandBuffer;
             
+            // 清理 Keywords
+            ClearRenderingState(CommandBufferHelpers.GetRasterCommandBuffer(cmd));
+            context.ExecuteCommandBuffer(cmd);
+            cmd.Clear();
+            
             // 执行Pass Configure
             ConfigureRenderPassList(context, ref renderingData);
             
@@ -55,5 +60,14 @@ namespace UnityEngine.Rendering.MotoyincLab
             context.SetupCameraProperties(camera);
             cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, cameraData.worldSpaceCameraPos);
         }
+        
+
+        static void ClearRenderingState(IBaseCommandBuffer cmd)
+        {
+            using var profScope = new ProfilingScope(Profiling.clearRenderingState);
+            cmd.SetKeyword(ShaderGlobalKeywords.MainLightShadows, false);
+            cmd.SetKeyword(ShaderGlobalKeywords.MainLightShadowCascades, false);
+        }
+        
     }
 }

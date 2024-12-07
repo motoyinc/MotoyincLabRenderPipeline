@@ -5,6 +5,7 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
 #include "UnityInput.hlsl"
 #include "SurfaceData.hlsl"
+#include "Input.hlsl"
 
 struct BRDFData {
     float3 diffuse;
@@ -30,9 +31,9 @@ BRDFData GetBRDF (SurfaceData surface) {
     return brdf;
 }
 
-float DirectBRDFSpecular (SurfaceData surface, BRDFData brdf, Light light) {
-    float3 h = SafeNormalize(light.direction + surface.viewDirection);
-    float nh2 = Square(saturate(dot(surface.normal, h)));
+float DirectBRDFSpecular (InputData inputData, BRDFData brdf, Light light) {
+    float3 h = SafeNormalize(light.direction + inputData.viewDirectionWS);
+    float nh2 = Square(saturate(dot(inputData.normalWS, h)));
     float lh2 = Square(saturate(dot(light.direction, h)));
     float r2 = Square(brdf.roughness);
     float d2 = Square(nh2 * (r2 - 1.0) + 1.00001);
@@ -40,14 +41,14 @@ float DirectBRDFSpecular (SurfaceData surface, BRDFData brdf, Light light) {
     return r2 / (d2 * max(0.1, lh2) * normalization);
 }
 
-float DirectBRDFPhongSpecular (SurfaceData surface, BRDFData brdf, Light light) {
-    float3 r = SafeNormalize(reflect(-light.direction, surface.normal));
-    float specular = (1-brdf.roughness) * pow(max(0.0, dot(r, surface.viewDirection)), (1-brdf.roughness+0.01)*100);
+float DirectBRDFPhongSpecular (InputData inputData, BRDFData brdf, Light light) {
+    float3 r = SafeNormalize(reflect(-light.direction, inputData.normalWS));
+    float specular = (1-brdf.roughness) * pow(max(0.0, dot(r, inputData.viewDirectionWS)), (1-brdf.roughness+0.01)*100);
     return specular;
 }
 
-float3 DirectBRDF (SurfaceData surface, BRDFData brdf, Light light) {
-    return DirectBRDFSpecular(surface, brdf, light) * brdf.specular  + brdf.diffuse;
+float3 DirectBRDF (InputData inputData, BRDFData brdf, Light light) {
+    return DirectBRDFSpecular(inputData, brdf, light) * brdf.specular  + brdf.diffuse;
 }
 
 #endif

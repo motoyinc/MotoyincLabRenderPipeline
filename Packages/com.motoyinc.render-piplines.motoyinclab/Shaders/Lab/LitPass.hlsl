@@ -3,6 +3,8 @@
 
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Common.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/SurfaceData.hlsl"
+#include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Input.hlsl"
+#include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Shadows.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/RealtimeLight.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Lighting.hlsl"
 
@@ -14,6 +16,9 @@ struct Attributes {
 };
 struct Varyings {
     float4 positionCS : SV_POSITION;
+    #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
+        float4 shadowCoord : VAR_SHADOW_UV;
+    #endif
     float3 positionWS : VAR_POSITION_WS;
     float3 normalWS : VAR_NORMAL;
     float2 baseUV : VAR_BASE_UV;
@@ -39,6 +44,9 @@ Varyings LitPassVertex (Attributes input){
     output.normalWS = TransformObjectToWorldNormal(input.normalOS);
     float4 baseST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
     output.baseUV = input.baseUV * baseST.xy + baseST.zw;
+    #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
+    output.shadowCoord = TransformWorldToShadowCoord(output.positionWS);
+    #endif
     return output;
 }
 
@@ -47,19 +55,31 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     SurfaceData surface;
     UNITY_SETUP_INSTANCE_ID(input);
     float baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.baseUV);
+    
     float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
     
     // 采集几何信息
     surface.color = baseMap * baseColor;
-    surface.normal = normalize(input.normalWS);
     surface.alpha = baseColor.a;
-    surface.viewDirection = normalize(_WorldSpaceCameraPos - input.positionWS);
     surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
     surface.roughness =UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Roughness);
 
+    //环境数据信息收集
+    InputData inputData;
+    inputData.positionWS = input.positionWS;
+    inputData.positionCS = input.positionCS;
+    inputData.normalWS = normalize(input.normalWS);
+    inputData.viewDirectionWS = normalize(_WorldSpaceCameraPos - input.positionWS);
+    #ifdef _MAIN_LIGHT_SHADOWS_CASCADE
+        inputData.shadowCoord = TransformWorldToShadowCoord(inputData.positionWS);
+    #else
+        inputData.shadowCoord = input.shadowCoord;
+    #endif
+    inputData.shadowMask = 0.0f;
+    
     //计算光照颜色
     BRDFData brdf = GetBRDF(surface);
-    float3 color = GetLighting(surface, brdf, input.positionWS);
+    float3 color = GetLighting(inputData, brdf);
     
     #if defined(_CLIPPING)
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
@@ -68,8 +88,13 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     #if defined(_GLOBAL_DEBUG)
     return DebugSurface(surface);
     #endif
-
+    // float4 shadowCoord = TransformWorldToShadowCoord(inputData.positionWS);
+    // float shadowMap = MainLightRealtimeShadow(shadowCoord);
+    // return shadowMap;
+    // return MainLightShadow(inputData.shadowCoord,inputData.positionWS);
     // 输出颜色
+    // return ComputeCascadeIndex(inputData.positionWS);
+    // return inputData.shadowCoord;
     return float4(color,surface.alpha);
 }
 

@@ -10,7 +10,12 @@
             // 初始化RT大小（并非RT大小）
             shadowData.mainLightShadowmapHeight = settings.shadowSettings.mainLightShadowmapResolution;
             shadowData.mainLightShadowmapWidth = settings.shadowSettings.mainLightShadowmapResolution;
+            
+            // 初始化联级属性
             shadowData.mainLightShadowCascadesCount = settings.shadowSettings.shadowCascadeCount;
+            shadowData.mainLightShadowCascadesSplit = GetMainLightCascadeSplit(shadowData.mainLightShadowCascadesCount, settings);
+            shadowData.mainLightShadowCascadeBorder = settings.shadowSettings.cascadeBorder;
+            
             
             // 这部分内容是在Pass内做的，这里只先进行初始化
             shadowData.isKeywordAdditionalLightShadowsEnabled = false;
@@ -59,6 +64,17 @@
                 currentTileCount = atlasWidth / resolution * atlasHeight / resolution;
             }
             return resolution;
+        }
+        
+        private static Vector3 GetMainLightCascadeSplit(int mainLightShadowCascadesCount, MotoyincLabRenderPipelineAsset asset)
+        {
+            switch (mainLightShadowCascadesCount)
+            {
+                case 1:  return new Vector3(1.0f, 0.0f, 0.0f);
+                case 2:  return new Vector3(asset.shadowSettings.cascade2Split, 1.0f, 0.0f);
+                case 3:  return asset.shadowSettings.cascade3Split;
+                default: return asset.shadowSettings.cascade4Split;
+            }
         }
     }
 }
