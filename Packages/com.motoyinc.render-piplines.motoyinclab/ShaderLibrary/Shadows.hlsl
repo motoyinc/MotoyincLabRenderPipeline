@@ -111,5 +111,23 @@ half4 MainLightShadow(float4 shadowCoord, float3 positionWS)
 }
 
 
+/////////////////////////////////////////////////////////////////////////////
+///                             修复阴影BUG                                ///
+/////////////////////////////////////////////////////////////////////////////
+
+// 调整近平面剪裁值为最小值
+float4 ApplyShadowClamping(float4 positionCS)
+{
+    #if UNITY_REVERSED_Z
+    float clamped = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+    #else
+    float clamped = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+    #endif
+
+    positionCS.z = clamped;
+    return positionCS;
+}
+
+
 
 #endif
