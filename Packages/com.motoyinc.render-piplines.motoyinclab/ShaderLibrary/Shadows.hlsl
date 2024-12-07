@@ -7,6 +7,9 @@
 
 #define MAX_SHADOW_CASCADES 4
 
+#if defined(_MAIN_LIGHT_SHADOWS) || defined(_MAIN_LIGHT_SHADOWS_CASCADE)
+    #define MAIN_LIGHT_CALCULATE_SHADOWS
+#endif
 
 struct ShadowSamplingData
 {
@@ -102,9 +105,14 @@ half GetMainLightShadowFade(float3 positionWS)
     return half(fade);
 }
 
-half4 MainLightShadow(float4 shadowCoord, float3 positionWS)
+half MainLightShadow(float4 shadowCoord, float3 positionWS)
 {
-    half realtimeShadow = MainLightRealtimeShadow(shadowCoord);
+    #if !defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+        half realtimeShadow =half(1.0);
+    #else
+        half realtimeShadow = MainLightRealtimeShadow(shadowCoord);
+    #endif
+    
     half shadowFade = GetMainLightShadowFade(positionWS);
     half shadowBake = 1.0f;
     return lerp(realtimeShadow, shadowBake, shadowFade);
@@ -128,6 +136,22 @@ float4 ApplyShadowClamping(float4 positionCS)
     return positionCS;
 }
 
+
+float4 _ShadowBias;
+half IsDirectionalLight()
+{
+    return round(_ShadowBias.z) == 1.0 ? 1 : 0;
+}
+float3 ApplyShadowBias(float3 positionWS, float3 normalWS, float3 lightDirection)
+{
+    float invNdotL = 1.0 - saturate(dot(lightDirection, normalWS));
+    float scale = invNdotL * _ShadowBias.y;
+
+    // normal bias is negative since we want to apply an inset normal offset
+    positionWS = lightDirection * _ShadowBias.xxx + positionWS;
+    positionWS = normalWS * scale.xxx + positionWS;
+    return positionWS;
+}
 
 
 #endif
