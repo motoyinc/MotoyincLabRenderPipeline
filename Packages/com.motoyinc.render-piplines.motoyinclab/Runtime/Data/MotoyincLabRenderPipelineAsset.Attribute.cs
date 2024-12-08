@@ -61,12 +61,12 @@ namespace UnityEngine.Rendering.MotoyincLab
 
 #if UNITY_EDITOR
         // Debug mode
-        [SerializeField] private GlobalDebugMode m_GlobalDebugMode = GlobalDebugMode.Off;
+        [SerializeField] private DebugSettings m_DebugSettings = default;
 
-        public GlobalDebugMode globalDebugMode
+        public DebugSettings debugSettings
         {
-            get => m_GlobalDebugMode;
-            set => m_GlobalDebugMode = value;
+            get => m_DebugSettings;
+            set => m_DebugSettings = value;
         }
 #endif
 

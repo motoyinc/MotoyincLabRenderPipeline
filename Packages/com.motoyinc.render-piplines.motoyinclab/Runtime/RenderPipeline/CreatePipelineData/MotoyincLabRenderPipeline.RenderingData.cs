@@ -9,7 +9,7 @@
             data.supportsDynamicBatching = settings.supportsDynamicBatching;
             data.m_CommandBuffer = cmd;
 #if UNITY_EDITOR
-            data.globalDebugMode = settings.globalDebugMode;
+            data.debugSettings = settings.debugSettings;
 #endif
             
             return data;

@@ -25,7 +25,7 @@
             #pragma shader_feature _CLIPPING
 
             // Pipeline keywords
-            #pragma shader_feature _GLOBAL_DEBUG
+            #pragma shader_feature _DEBUG_MODE
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment

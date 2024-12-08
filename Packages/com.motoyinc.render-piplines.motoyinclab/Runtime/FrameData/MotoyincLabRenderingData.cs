@@ -6,7 +6,7 @@
         public CullingResults cullResults;
         public bool supportsDynamicBatching;
 #if UNITY_EDITOR
-        public GlobalDebugMode globalDebugMode;
+        public DebugSettings debugSettings;
 #endif
         
 
@@ -25,7 +25,7 @@
             cullResults = default;
             supportsDynamicBatching = default;
 #if UNITY_EDITOR
-            globalDebugMode = GlobalDebugMode.Off;
+            debugSettings = default;
 #endif
         }
     }
