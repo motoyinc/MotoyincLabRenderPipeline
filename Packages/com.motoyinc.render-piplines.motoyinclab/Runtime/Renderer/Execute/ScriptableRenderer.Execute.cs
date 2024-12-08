@@ -60,6 +60,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         // Debug设置
         static void SetDebugMode(CommandBuffer cmd, DebugSettings debugSettings)
         {
+            cmd.SetGlobalInt(ShaderPropertyId.DisplayShadowCascade, debugSettings.displayShadowCascade);
+            cmd.SetGlobalInt(ShaderPropertyId.DisplayGeometryBufferMode, (int)debugSettings.geometryBufferMode);
             cmd.SetKeyword(ShaderGlobalKeywords.DebugMode, debugSettings.DebugMode == DebugMode.On);
         }
 #endif

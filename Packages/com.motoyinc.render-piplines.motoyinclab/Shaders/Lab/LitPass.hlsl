@@ -8,6 +8,11 @@
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/RealtimeLight.hlsl"
 #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Lighting.hlsl"
 
+#if _DEBUG_MODE
+    #include "Packages/com.motoyinc.render-piplines.motoyinclab/ShaderLibrary/Debug.hlsl" 
+#endif
+
+
 struct Attributes {
     float3 positionOS : POSITION;
     float3 normalOS : NORMAL;
@@ -85,16 +90,12 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
     #endif
 
-    #if defined(_GLOBAL_DEBUG)
-    return DebugSurface(surface);
+    
+    #if defined(_DEBUG_MODE)
+        float4 output_color = float4(color,surface.alpha);
+        return DebugOutput(output_color, surface, inputData, brdf);
     #endif
-    // float4 shadowCoord = TransformWorldToShadowCoord(inputData.positionWS);
-    // float shadowMap = MainLightRealtimeShadow(shadowCoord);
-    // return shadowMap;
-    // return MainLightShadow(inputData.shadowCoord,inputData.positionWS);
-    // 输出颜色
-    // return ComputeCascadeIndex(inputData.positionWS);
-    // return inputData.shadowCoord;
+    
     return float4(color,surface.alpha);
 }
 
