@@ -34,7 +34,7 @@
         public ref bool supportsDynamicBatching => ref frameData.Get<MotoyincLabRenderingData>().supportsDynamicBatching;
 
 #if UNITY_EDITOR
-        public ref GlobalDebugMode globalDebugMode => ref frameData.Get<MotoyincLabRenderingData>().globalDebugMode;
+        public ref DebugSettings debugSettings => ref frameData.Get<MotoyincLabRenderingData>().debugSettings;
 #endif
 
     }

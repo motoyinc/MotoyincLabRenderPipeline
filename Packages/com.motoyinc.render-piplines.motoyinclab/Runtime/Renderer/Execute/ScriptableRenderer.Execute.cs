@@ -22,6 +22,10 @@ namespace UnityEngine.Rendering.MotoyincLab
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             
+#if UNITY_EDITOR
+            SetDebugMode(cmd, renderingData.debugSettings);
+#endif
+            
             // 执行Pass Configure
             ConfigureRenderPassList(context, ref renderingData);
             
@@ -51,6 +55,12 @@ namespace UnityEngine.Rendering.MotoyincLab
                 context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
                 context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
             }
+        }
+        
+        // Debug设置
+        static void SetDebugMode(CommandBuffer cmd, DebugSettings debugSettings)
+        {
+            cmd.SetKeyword(ShaderGlobalKeywords.DebugMode, debugSettings.DebugMode == DebugMode.On);
         }
 #endif
         
