@@ -10,8 +10,10 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] Vector2 m_Cascade3Split = new Vector2(0.1f, 0.3f);
         [SerializeField] Vector3 m_Cascade4Split = new Vector3(0.067f, 0.2f, 0.467f);
         [SerializeField][Range(0.0f,1.0f)] float m_CascadeBorder = 0.2f;
-        
         [SerializeField] ShadowResolution m_MainLightShadowmapResolution = ShadowResolution._1024;
+        // 软阴影
+        [SerializeField] bool m_SoftShadowsSupported = false;
+        [SerializeField][Range(1,3)] int m_ShadowQuality = 1;
         
         
         public float maxDistance
@@ -61,6 +63,20 @@ namespace UnityEngine.Rendering.MotoyincLab
             get => m_CascadeBorder;
             set => m_CascadeBorder = value;
         }
+        
+        public bool supportsSoftShadows
+        {
+            get => m_SoftShadowsSupported;
+            internal set => m_SoftShadowsSupported = value;
+        }
+        
+        public int shadowQuality
+        {
+            get => m_ShadowQuality;
+            set => m_ShadowQuality = value;
+        }
+        
+        
         
     }
     

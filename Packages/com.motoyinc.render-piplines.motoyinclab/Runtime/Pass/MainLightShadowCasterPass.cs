@@ -10,6 +10,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             public static readonly int _MainLightShadowmapID = Shader.PropertyToID(k_MainLightShadowMapTextureName);
             public static readonly int _WorldToShadow = Shader.PropertyToID("_MainLightWorldToShadow");
             public static readonly int _ShadowParams = Shader.PropertyToID("_MainLightShadowParams");
+            public static readonly int _ShadowmapSize = Shader.PropertyToID("_MainLightShadowmapSize");
             
             public static readonly int _CascadeShadowSplitSpheres0 = Shader.PropertyToID("_CascadeShadowSplitSpheres0");
             public static readonly int _CascadeShadowSplitSpheres1 = Shader.PropertyToID("_CascadeShadowSplitSpheres1");
@@ -174,7 +175,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                 
                 // -------------收集阴影信息-------------
                 // 向GPU发送阴影数据
-                SetupMainLightShadowDataConstants(cmd, ref m_PassData);
+                SetupMainLightShadowDataConstants(cmd, ref m_PassData, shadowData);
                 
                 // 将阴影RT所为Tex输入
                 cmd.SetGlobalTexture(MainLightShadowConstantBuffer._MainLightShadowmapID, m_MainLightShadowmapTexture.nameID);
@@ -239,19 +240,43 @@ namespace UnityEngine.Rendering.MotoyincLab
         }
         
         // 收集 阴影相关数据
-        void SetupMainLightShadowDataConstants(CommandBuffer cmd, ref PassData data)
+        void SetupMainLightShadowDataConstants(CommandBuffer cmd, ref PassData data, MotoyincLabShadowData shadowData)
         {
             var lightData = data.lightData;
             var shadowLightIndex = lightData.mainLightIndex;
             if (shadowLightIndex == -1)
                 return;
             VisibleLight shadowLight = lightData.visibleLights[shadowLightIndex];
+            Light light = shadowLight.light;
+            
             
             // ///【阴影数据】/// //
-            // x: 阴影强度[v]， y: 软阴影[x]， z：阴影淡化的范围[x]， w:阴影淡化偏移值[x]
+            // 最远距离淡出
             ShadowUtils.GetScaleAndBiasForLinearDistanceFade(m_MaxShadowDistanceSq, m_CascadeBorder, out float shadowFadeScale, out float shadowFadeBias);
-            Vector4 shadowDataBuffer = new Vector4(shadowLight.light.shadowStrength, 0.0f, shadowFadeScale, shadowFadeBias);
+            
+            // 软阴影支持
+            int shadowQuality = 0;
+            if (shadowData.supportsSoftShadows)
+            {
+                shadowQuality = shadowData.mainShadowQuality;
+                bool isSoftShadowsEnable = ShadowUtils.SoftShadowQualityToShaderProperty(light, ref shadowQuality);
+                if(isSoftShadowsEnable)
+                {
+                    // ShadowTexture尺寸
+                    float invShadowAtlasWidth = 1.0f / renderTargetWidth;
+                    float invShadowAtlasHeight = 1.0f / renderTargetHeight;
+                    cmd.SetGlobalVector(MainLightShadowConstantBuffer._ShadowmapSize, new Vector4(invShadowAtlasWidth,
+                        invShadowAtlasHeight,
+                        renderTargetWidth, renderTargetHeight));
+                }
+                else
+                    shadowQuality = 0;
+            }
+            
+            // x: 阴影强度[v]， y: 软阴影[x]， z：阴影淡化的范围[x]， w:阴影淡化偏移值[x]
+            Vector4 shadowDataBuffer = new Vector4(shadowLight.light.shadowStrength, shadowQuality, shadowFadeScale, shadowFadeBias);
             cmd.SetGlobalVector(MainLightShadowConstantBuffer._ShadowParams, shadowDataBuffer);
+            
             
             
             // ///【阴影矩阵】/// //

@@ -10,12 +10,15 @@
         public int mainLightShadowCascadesCount;        // 联级 联级数量
         public Vector3 mainLightShadowCascadesSplit;    // 联级分割比
         public float mainLightShadowCascadeBorder;      // 最后一个联级淡出（宽度为0~1，为0是会关闭 shadow fade）
+        public bool supportsSoftShadows;
         
         // 主光信息
         internal bool mainLightShadowsEnabled;          // 开启阴影
         internal int mainLightShadowResolution;         // 联级 每个联级RT大小
         internal int mainLightRenderTargetWidth;        // 阴影RT 整个RT的宽度
         internal int mainLightRenderTargetHeight;       // 阴影RT 整个RT的高度
+        internal int mainShadowQuality;
+        
         
         // 附加光信息
         internal bool additionalLightShadowsEnabled;
@@ -34,11 +37,13 @@
             supportsAdditionalLightShadows = false;
             mainLightShadowCascadesCount = 0;
             mainLightShadowCascadesSplit = Vector3.zero;
+            supportsSoftShadows = false;
             
             mainLightShadowsEnabled = false;
             mainLightShadowResolution = 0;
             mainLightRenderTargetWidth = 0;
             mainLightRenderTargetHeight = 0;
+            mainShadowQuality = 1;
 
             additionalLightShadowsEnabled = false;
             isKeywordAdditionalLightShadowsEnabled = false;

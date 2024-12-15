@@ -120,5 +120,18 @@ namespace UnityEngine.Rendering.MotoyincLab
             scale = 1.0f / (fadeDistance - distanceFadeNear);
             bias = -distanceFadeNear / (fadeDistance - distanceFadeNear);
         }
+
+        // 返回 阴影质量 （主要是判断是从Light中获取，还是使用管线设置）
+        internal static bool SoftShadowQualityToShaderProperty(Light light, ref int shadowQuality)
+        {
+            if (light.TryGetComponent(out MotoyincLabAdditionalLightData additionalLightData))
+            {
+                if (additionalLightData.supportSoftShadow == SupportSoftShadow.Off)
+                    return false;
+                if (additionalLightData.supportSoftShadow != SupportSoftShadow.UsePipelineSettings)
+                    shadowQuality = additionalLightData.shadowQuality;
+            }
+            return true;
+        }
     }
 }

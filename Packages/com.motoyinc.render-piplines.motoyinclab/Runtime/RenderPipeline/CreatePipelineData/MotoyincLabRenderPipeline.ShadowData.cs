@@ -50,6 +50,10 @@
                 shadowData.mainLightRenderTargetHeight = 0;
             }
             
+            // 软阴影支持
+            shadowData.supportsSoftShadows = settings.shadowSettings.supportsSoftShadows && (shadowData.supportsMainLightShadows || shadowData.supportsAdditionalLightShadows);
+            shadowData.mainShadowQuality = settings.shadowSettings.shadowQuality;
+            
             return shadowData;
         }
         
