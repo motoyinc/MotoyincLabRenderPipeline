@@ -186,6 +186,7 @@ real SampleMainLightShadowmap(float4 shadowCoord, ShadowSamplingData samplingDat
     if(shadowParams.y == SOFT_SHADOW_QUALITY_HIGH)
         attenuation =  SampleShadowmapFilteredHighQuality(TEXTURE2D_SHADOW_ARGS(_MainLightShadowmapTexture, sampler_LinearClampCompare), shadowCoord, samplingData);
 
+    attenuation = LerpWhiteTo(attenuation, shadowStrength);
     return attenuation;
 }
 
