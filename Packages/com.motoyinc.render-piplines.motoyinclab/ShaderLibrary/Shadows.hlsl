@@ -18,6 +18,7 @@
 #define SOFT_SHADOW_QUALITY_MEDIUM half(2.0)
 #define SOFT_SHADOW_QUALITY_HIGH   half(3.0)
 
+#define BEYOND_SHADOW_FAR(shadowCoord) shadowCoord.z <= 0.0 || shadowCoord.z >= 1.0
 
 /////////////////////////////////////////////////////////////////////////////
 ///                         主光源数据计算                                  ///
@@ -187,7 +188,7 @@ real SampleMainLightShadowmap(float4 shadowCoord, ShadowSamplingData samplingDat
         attenuation =  SampleShadowmapFilteredHighQuality(TEXTURE2D_SHADOW_ARGS(_MainLightShadowmapTexture, sampler_LinearClampCompare), shadowCoord, samplingData);
 
     attenuation = LerpWhiteTo(attenuation, shadowStrength);
-    return attenuation;
+    return BEYOND_SHADOW_FAR(shadowCoord) ? 1.0 : attenuation;
 }
 
 
@@ -286,20 +287,14 @@ float4 ApplyShadowClamping(float4 positionCS)
 
 
 float4 _ShadowBias;
-half IsDirectionalLight()
-{
-    return round(_ShadowBias.z) == 1.0 ? 1 : 0;
-}
 float3 ApplyShadowBias(float3 positionWS, float3 normalWS, float3 lightDirection)
 {
     float invNdotL = 1.0 - saturate(dot(lightDirection, normalWS));
     float scale = invNdotL * _ShadowBias.y;
 
-    // normal bias is negative since we want to apply an inset normal offset
     positionWS = lightDirection * _ShadowBias.xxx + positionWS;
     positionWS = normalWS * scale.xxx + positionWS;
-    return positionWS;
+    return positionWS ;
 }
-
 
 #endif

@@ -14,6 +14,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 软阴影
         [SerializeField] bool m_SoftShadowsSupported = false;
         [SerializeField][Range(1,3)] int m_ShadowQuality = 1;
+        [SerializeField][Range(0,10)] float m_ShadowDepthBias = 1.0f;
+        [SerializeField][Range(0,10)] float m_ShadowNormalBias = 1.0f;
         
         
         public float maxDistance
@@ -76,7 +78,27 @@ namespace UnityEngine.Rendering.MotoyincLab
             set => m_ShadowQuality = value;
         }
         
+        public float shadowDepthBias
+        {
+            get => m_ShadowDepthBias;
+            set => m_ShadowDepthBias = ValidateShadowBias(value);
+        }
         
+        public float shadowNormalBias
+        {
+            get => m_ShadowNormalBias;
+            set => m_ShadowNormalBias = ValidateShadowBias(value);
+        }
+        
+        public static float maxShadowBias
+        {
+            get => 10.0f;
+        }
+        
+        float ValidateShadowBias(float value)
+        {
+            return Mathf.Max(0.0f, Mathf.Min(value, maxShadowBias));
+        }
         
     }
     

@@ -1,4 +1,5 @@
-﻿namespace UnityEngine.Rendering.MotoyincLab
+﻿using System.Collections.Generic;
+namespace UnityEngine.Rendering.MotoyincLab
 {
     public class MotoyincLabShadowData : ContextItem
     {
@@ -11,6 +12,7 @@
         public Vector3 mainLightShadowCascadesSplit;    // 联级分割比
         public float mainLightShadowCascadeBorder;      // 最后一个联级淡出（宽度为0~1，为0是会关闭 shadow fade）
         public bool supportsSoftShadows;
+        public List<Vector4> bias;
         
         // 主光信息
         internal bool mainLightShadowsEnabled;          // 开启阴影
@@ -38,6 +40,7 @@
             mainLightShadowCascadesCount = 0;
             mainLightShadowCascadesSplit = Vector3.zero;
             supportsSoftShadows = false;
+            bias?.Clear();
             
             mainLightShadowsEnabled = false;
             mainLightShadowResolution = 0;

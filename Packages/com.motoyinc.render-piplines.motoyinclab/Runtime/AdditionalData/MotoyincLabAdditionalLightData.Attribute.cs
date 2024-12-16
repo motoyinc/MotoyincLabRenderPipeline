@@ -50,5 +50,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             set => m_ShadowQuality = value;
         }
         
+        [SerializeField] bool m_UsePipelineSettings = true;
+        public bool usePipelineSettings
+        {
+            get { return m_UsePipelineSettings; }
+            set { m_UsePipelineSettings = value; }
+        }
     }
 }

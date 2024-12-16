@@ -152,7 +152,12 @@ namespace UnityEngine.Rendering.MotoyincLab
             var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
             var lightData = renderingData.frameData.Get<MotoyincLabLightData>();
             var shadowData = renderingData.frameData.Get<MotoyincLabShadowData>();
-
+            
+            int shadowLightIndex = lightData.mainLightIndex;
+            if (shadowLightIndex == -1)
+                return;
+            VisibleLight shadowLight = lightData.visibleLights[shadowLightIndex];
+            
             InitPassData(ref m_PassData, motoyincLabRenderingData, cameraData, lightData, shadowData);
             
             
@@ -169,6 +174,10 @@ namespace UnityEngine.Rendering.MotoyincLab
                 // 渲染阴影RT
                 for (int i = 0; i < m_ShadowCasterCascadesCount; i++)
                 {
+                    // shadowBias 阴影偏移
+                    // X：Depth Bias     Y：normal Bias    Z: light Type      W：闲置
+                    Vector4 shadowBias = ShadowUtils.GetShadowBias(ref shadowLight, shadowLightIndex, shadowData, m_CascadeSlices[i].projectionMatrix, m_CascadeSlices[i].resolution);
+                    ShadowUtils.SetupShadowCasterConstantBuffer(cmd, ref shadowLight, shadowBias);
                     ShadowUtils.DrawShadowCascadesRT(cmd, ref  m_CascadeSlices[i], ref m_PassData.shadowRendererLists[i]);
                 }
                 
@@ -293,7 +302,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             noOpShadowMatrix.m22 = (SystemInfo.usesReversedZBuffer) ? 1.0f : 0.0f;
             for (int i = cascadeCounts; i <= k_MaxCascades; ++i)
             {
-                m_MainLightShadowMatrices[i] = m_MainLightShadowMatrices[cascadeCounts-1];
+                // 用最后一个层级填充空矩阵
+                // m_MainLightShadowMatrices[i] = m_MainLightShadowMatrices[cascadeCounts-1];
+                
+                // 用零矩阵填充空矩阵
+                m_MainLightShadowMatrices[i] = noOpShadowMatrix;
             }
             
             cmd.SetGlobalMatrixArray(MainLightShadowConstantBuffer._WorldToShadow, m_MainLightShadowMatrices);
