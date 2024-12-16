@@ -120,5 +120,109 @@ namespace UnityEngine.Rendering.MotoyincLab
             scale = 1.0f / (fadeDistance - distanceFadeNear);
             bias = -distanceFadeNear / (fadeDistance - distanceFadeNear);
         }
+
+        // 返回 阴影质量 （主要是判断是从Light中获取，还是使用管线设置）
+        internal static bool SoftShadowQualityToShaderProperty(Light light, ref int shadowQuality)
+        {
+            if (light.TryGetComponent(out MotoyincLabAdditionalLightData additionalLightData))
+            {
+                if (additionalLightData.supportSoftShadow == SupportSoftShadow.Off)
+                    return false;
+                if (additionalLightData.supportSoftShadow != SupportSoftShadow.UsePipelineSettings)
+                    shadowQuality = additionalLightData.shadowQuality;
+            }
+            return true;
+        }
+
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///                                               Shadow Bias                                          ///
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public static Vector4 GetShadowBias(ref VisibleLight shadowLight, int shadowLightIndex, MotoyincLabShadowData shadowData, Matrix4x4 lightProjectionMatrix, float shadowResolution)
+        {
+            return GetShadowBias(ref shadowLight, shadowLightIndex, shadowData.bias, shadowData, lightProjectionMatrix, shadowResolution);
+        }
+
+        static Vector4 GetShadowBias(ref VisibleLight shadowLight, int shadowLightIndex, List<Vector4> bias, MotoyincLabShadowData shadowData, Matrix4x4 lightProjectionMatrix, float shadowResolution)
+        {
+            bool supportsSoftShadows = shadowData.supportsSoftShadows;
+            if (shadowLightIndex < 0 || shadowLightIndex >= bias.Count)
+            {
+                Debug.LogWarning($"阴影灯光引索 \"{shadowLightIndex}\" 是无效引索，请检查 bias 列表.");
+                return Vector4.zero;
+            }
+            
+            // TODO ：  目前不支持非直射光 Bias 操作
+            if (shadowLight.lightType != LightType.Directional)
+            {
+                Debug.LogWarning($"TODO : 目前不支持非直射光 Bias 操作");
+                return Vector4.zero;
+            }
+
+            float frustumSize;
+            if (shadowLight.lightType == LightType.Directional)
+            {
+                frustumSize = 2.0f / lightProjectionMatrix.m00;
+            }
+            else
+            {
+                Debug.LogWarning("Only point, spot and directional shadow casters are supported in universal pipeline");
+                frustumSize = 0.0f;
+            }
+
+            float texelSize = frustumSize / shadowResolution;
+            float depthBias = -bias[shadowLightIndex].x * texelSize;
+            float normalBias = -bias[shadowLightIndex].y * texelSize;
+            
+            // 支持 SoftShadow 时扩大 Bias的值
+            if (supportsSoftShadows && shadowLight.light.shadows == LightShadows.Soft)
+            {
+                int shadowQuality = shadowData.mainShadowQuality;
+                bool isSoftShadowsEnable = ShadowUtils.SoftShadowQualityToShaderProperty(shadowLight.light, ref shadowQuality);
+                
+                float kernelRadius = 2.5f;
+
+                switch (shadowQuality)
+                {
+                    case 3: kernelRadius = 3.5f; break; // 7x7
+                    case 2: kernelRadius = 2.5f; break; // 5x5
+                    case 1: kernelRadius = 1.5f; break; // 3x3
+                    default: break;
+                }
+                depthBias *= kernelRadius;
+                normalBias *= kernelRadius;
+            }
+
+            return new Vector4(depthBias, normalBias, (float)shadowLight.lightType, 0.0f);
+        }
+        
+        
+        // 设置ShadowsMap渲染信息
+        internal static void SetupShadowCasterConstantBuffer(CommandBuffer cmd, ref VisibleLight shadowLight, Vector4 shadowBias)
+        {
+            SetShadowBias(cmd, shadowBias);
+            
+            Vector3 lightDirection = -shadowLight.localToWorldMatrix.GetColumn(2);
+            SetLightDirection(cmd, lightDirection);
+            
+            Vector3 lightPosition = shadowLight.localToWorldMatrix.GetColumn(3);
+            SetLightPosition(cmd, lightPosition);
+        }
+        
+        internal static void SetShadowBias(CommandBuffer cmd, Vector4 shadowBias)
+        {
+            cmd.SetGlobalVector(ShaderPropertyId.shadowBias, shadowBias);
+        }
+        
+        internal static void SetLightDirection(CommandBuffer cmd, Vector3 lightDirection)
+        {
+            cmd.SetGlobalVector(ShaderPropertyId.lightDirection, new Vector4(lightDirection.x, lightDirection.y, lightDirection.z, 0.0f));
+        }
+
+        internal static void SetLightPosition(CommandBuffer cmd, Vector3 lightPosition)
+        {
+            cmd.SetGlobalVector(ShaderPropertyId.lightPosition, new Vector4(lightPosition.x, lightPosition.y, lightPosition.z, 1.0f));
+        }
     }
 }

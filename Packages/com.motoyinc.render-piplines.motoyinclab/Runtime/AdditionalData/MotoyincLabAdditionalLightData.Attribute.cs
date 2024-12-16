@@ -1,6 +1,13 @@
 ﻿using System;
 namespace UnityEngine.Rendering.MotoyincLab
 {
+    public enum SupportSoftShadow
+    {
+        UsePipelineSettings,
+        Off,
+        On,
+    }
+    
     public partial class MotoyincLabAdditionalLightData 
     {
         [NonSerialized] private Light m_Light;
@@ -29,6 +36,25 @@ namespace UnityEngine.Rendering.MotoyincLab
                 light.innerSpotAngle = m_innerSpotAngle;
         }
 #endif
+        [SerializeField] private SupportSoftShadow m_SupportSoftShadow;
+        public SupportSoftShadow supportSoftShadow
+        {
+            get => m_SupportSoftShadow;
+            set => m_SupportSoftShadow = value;
+        }
         
+        [SerializeField][Range(1,3)] int m_ShadowQuality = 1;
+        public int shadowQuality
+        {
+            get => m_ShadowQuality;
+            set => m_ShadowQuality = value;
+        }
+        
+        [SerializeField] bool m_UsePipelineSettings = true;
+        public bool usePipelineSettings
+        {
+            get { return m_UsePipelineSettings; }
+            set { m_UsePipelineSettings = value; }
+        }
     }
 }

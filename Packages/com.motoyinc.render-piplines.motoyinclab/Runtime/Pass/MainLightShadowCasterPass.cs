@@ -10,6 +10,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             public static readonly int _MainLightShadowmapID = Shader.PropertyToID(k_MainLightShadowMapTextureName);
             public static readonly int _WorldToShadow = Shader.PropertyToID("_MainLightWorldToShadow");
             public static readonly int _ShadowParams = Shader.PropertyToID("_MainLightShadowParams");
+            public static readonly int _ShadowmapSize = Shader.PropertyToID("_MainLightShadowmapSize");
             
             public static readonly int _CascadeShadowSplitSpheres0 = Shader.PropertyToID("_CascadeShadowSplitSpheres0");
             public static readonly int _CascadeShadowSplitSpheres1 = Shader.PropertyToID("_CascadeShadowSplitSpheres1");
@@ -151,7 +152,12 @@ namespace UnityEngine.Rendering.MotoyincLab
             var cameraData = renderingData.frameData.Get<MotoyincLabCameraData>();
             var lightData = renderingData.frameData.Get<MotoyincLabLightData>();
             var shadowData = renderingData.frameData.Get<MotoyincLabShadowData>();
-
+            
+            int shadowLightIndex = lightData.mainLightIndex;
+            if (shadowLightIndex == -1)
+                return;
+            VisibleLight shadowLight = lightData.visibleLights[shadowLightIndex];
+            
             InitPassData(ref m_PassData, motoyincLabRenderingData, cameraData, lightData, shadowData);
             
             
@@ -168,13 +174,17 @@ namespace UnityEngine.Rendering.MotoyincLab
                 // 渲染阴影RT
                 for (int i = 0; i < m_ShadowCasterCascadesCount; i++)
                 {
+                    // shadowBias 阴影偏移
+                    // X：Depth Bias     Y：normal Bias    Z: light Type      W：闲置
+                    Vector4 shadowBias = ShadowUtils.GetShadowBias(ref shadowLight, shadowLightIndex, shadowData, m_CascadeSlices[i].projectionMatrix, m_CascadeSlices[i].resolution);
+                    ShadowUtils.SetupShadowCasterConstantBuffer(cmd, ref shadowLight, shadowBias);
                     ShadowUtils.DrawShadowCascadesRT(cmd, ref  m_CascadeSlices[i], ref m_PassData.shadowRendererLists[i]);
                 }
                 
                 
                 // -------------收集阴影信息-------------
                 // 向GPU发送阴影数据
-                SetupMainLightShadowDataConstants(cmd, ref m_PassData);
+                SetupMainLightShadowDataConstants(cmd, ref m_PassData, shadowData);
                 
                 // 将阴影RT所为Tex输入
                 cmd.SetGlobalTexture(MainLightShadowConstantBuffer._MainLightShadowmapID, m_MainLightShadowmapTexture.nameID);
@@ -239,19 +249,43 @@ namespace UnityEngine.Rendering.MotoyincLab
         }
         
         // 收集 阴影相关数据
-        void SetupMainLightShadowDataConstants(CommandBuffer cmd, ref PassData data)
+        void SetupMainLightShadowDataConstants(CommandBuffer cmd, ref PassData data, MotoyincLabShadowData shadowData)
         {
             var lightData = data.lightData;
             var shadowLightIndex = lightData.mainLightIndex;
             if (shadowLightIndex == -1)
                 return;
             VisibleLight shadowLight = lightData.visibleLights[shadowLightIndex];
+            Light light = shadowLight.light;
+            
             
             // ///【阴影数据】/// //
-            // x: 阴影强度[v]， y: 软阴影[x]， z：阴影淡化的范围[x]， w:阴影淡化偏移值[x]
+            // 最远距离淡出
             ShadowUtils.GetScaleAndBiasForLinearDistanceFade(m_MaxShadowDistanceSq, m_CascadeBorder, out float shadowFadeScale, out float shadowFadeBias);
-            Vector4 shadowDataBuffer = new Vector4(shadowLight.light.shadowStrength, 0.0f, shadowFadeScale, shadowFadeBias);
+            
+            // 软阴影支持
+            int shadowQuality = 0;
+            if (shadowData.supportsSoftShadows)
+            {
+                shadowQuality = shadowData.mainShadowQuality;
+                bool isSoftShadowsEnable = ShadowUtils.SoftShadowQualityToShaderProperty(light, ref shadowQuality);
+                if(isSoftShadowsEnable)
+                {
+                    // ShadowTexture尺寸
+                    float invShadowAtlasWidth = 1.0f / renderTargetWidth;
+                    float invShadowAtlasHeight = 1.0f / renderTargetHeight;
+                    cmd.SetGlobalVector(MainLightShadowConstantBuffer._ShadowmapSize, new Vector4(invShadowAtlasWidth,
+                        invShadowAtlasHeight,
+                        renderTargetWidth, renderTargetHeight));
+                }
+                else
+                    shadowQuality = 0;
+            }
+            
+            // x: 阴影强度[v]， y: 软阴影[x]， z：阴影淡化的范围[x]， w:阴影淡化偏移值[x]
+            Vector4 shadowDataBuffer = new Vector4(shadowLight.light.shadowStrength, shadowQuality, shadowFadeScale, shadowFadeBias);
             cmd.SetGlobalVector(MainLightShadowConstantBuffer._ShadowParams, shadowDataBuffer);
+            
             
             
             // ///【阴影矩阵】/// //
@@ -268,7 +302,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             noOpShadowMatrix.m22 = (SystemInfo.usesReversedZBuffer) ? 1.0f : 0.0f;
             for (int i = cascadeCounts; i <= k_MaxCascades; ++i)
             {
-                m_MainLightShadowMatrices[i] = m_MainLightShadowMatrices[cascadeCounts-1];
+                // 用最后一个层级填充空矩阵
+                // m_MainLightShadowMatrices[i] = m_MainLightShadowMatrices[cascadeCounts-1];
+                
+                // 用零矩阵填充空矩阵
+                m_MainLightShadowMatrices[i] = noOpShadowMatrix;
             }
             
             cmd.SetGlobalMatrixArray(MainLightShadowConstantBuffer._WorldToShadow, m_MainLightShadowMatrices);
