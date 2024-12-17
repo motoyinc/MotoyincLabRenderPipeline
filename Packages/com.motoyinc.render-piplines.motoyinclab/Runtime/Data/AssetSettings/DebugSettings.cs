@@ -13,23 +13,23 @@ namespace UnityEngine.Rendering.MotoyincLab
         RendingComplete = 0,
         
         // 物体信息
-        _______SurfaceInfo_______ = 0,
         Color = 1,
         Metallic = 2,
         Roughness = 3,
         Alpha = 4,
         
         // 空间信息
-        _______SpaceInfo_______ = 0,
         PositionWorldSpace = 10,
         NormalWorldSpace = 11,
         ViewDirectionWorldSpace = 12,
         MainShadowSpace = 13,
         
         // 灯光
-        _______LightInfo_______ = 0,
         MainLightColor = 30,
         MainLightShadow = 31,
+        
+        // Debug
+        DebugOutput = 100
         
     }
 
