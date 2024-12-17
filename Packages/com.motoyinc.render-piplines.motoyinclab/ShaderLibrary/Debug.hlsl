@@ -12,6 +12,12 @@ CBUFFER_START(_debug)
     int _DisplayGBuffer;
 CBUFFER_END
 
+float4 CustomDebugOutput(float4 output_color, SurfaceData surface, InputData inputData, BRDFData brdf)
+{
+    return output_color;
+}
+
+
 float4 DisplayShadowCascade(InputData inputData)
 {
     float shadowDebug = ComputeCascadeIndex(inputData.positionWS);
@@ -57,10 +63,12 @@ float4 DisplayGBuffer(SurfaceData surface, InputData inputData, BRDFData brdf)
 
 float4 DebugOutput(float4 output_color, SurfaceData surface, InputData inputData, BRDFData brdf)
 {
-    if (_DisplayGBuffer != 0)
+    if (_DisplayGBuffer != 0 && _DisplayGBuffer < 100)
         output_color = DisplayGBuffer(surface, inputData, brdf);
-    else if (_DisplayShadowCascade == 1)
+    else if (_DisplayShadowCascade == 1 && _DisplayGBuffer < 100)
         return DisplayShadowCascade(inputData) * 0.2 + output_color;
+    if(_DisplayGBuffer == 100)
+        return CustomDebugOutput(output_color, surface, inputData, brdf);
     
     return output_color;
 }

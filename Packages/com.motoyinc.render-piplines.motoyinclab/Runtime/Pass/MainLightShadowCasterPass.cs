@@ -215,6 +215,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             if (shadowLightIndex == -1)
                 return;
             var cullingResults = passData.renderingData.cullResults;
+
+            VisibleLight visibleLight = passData.lightData.visibleLights[shadowLightIndex];
             
             for (int i = 0; i < m_ShadowCasterCascadesCount; i++)
             {
@@ -226,7 +228,7 @@ namespace UnityEngine.Rendering.MotoyincLab
                     m_ShadowCasterCascadesCount,
                     m_ratios,
                     shadowResolution,
-                    0f,
+                    visibleLight.light.shadowNearPlane,
                     out Matrix4x4 viewMatrix,
                     out Matrix4x4 projectionMatrix,
                     out ShadowSplitData splitData

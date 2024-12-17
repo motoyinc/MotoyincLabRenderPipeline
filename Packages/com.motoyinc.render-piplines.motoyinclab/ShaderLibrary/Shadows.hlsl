@@ -23,7 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 ///                         主光源数据计算                                  ///
 /////////////////////////////////////////////////////////////////////////////
-
+float4 _ShadowBias;
+half IsDirectionalLight()
+{
+    return round(_ShadowBias.z) == 1.0 ? 1 : 0;
+}
 
 TEXTURE2D_SHADOW(_MainLightShadowmapTexture);
 SAMPLER_CMP(sampler_LinearClampCompare);
@@ -276,17 +280,19 @@ half MainLightShadow(float4 shadowCoord, float3 positionWS)
 float4 ApplyShadowClamping(float4 positionCS)
 {
     #if UNITY_REVERSED_Z
-    float clamped = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+        float clamped = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+    
     #else
-    float clamped = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+        float clamped = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+    
     #endif
 
-    positionCS.z = clamped;
+    positionCS.z = lerp(positionCS.z, clamped, IsDirectionalLight());
     return positionCS;
 }
 
 
-float4 _ShadowBias;
+
 float3 ApplyShadowBias(float3 positionWS, float3 normalWS, float3 lightDirection)
 {
     float invNdotL = 1.0 - saturate(dot(lightDirection, normalWS));

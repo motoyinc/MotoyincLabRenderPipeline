@@ -15,7 +15,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] bool m_SoftShadowsSupported = false;
         [SerializeField][Range(1,3)] int m_ShadowQuality = 1;
         [SerializeField][Range(0,10)] float m_ShadowDepthBias = 1.0f;
-        [SerializeField][Range(0,10)] float m_ShadowNormalBias = 1.0f;
+        [SerializeField][Range(0,2)] float m_ShadowNormalBias = 0.3f;
         
         
         public float maxDistance
