@@ -64,7 +64,15 @@ Light GetMainLight (InputData inputData) {
     light.color = _MainLightColor.rgb;
     light.direction = normalize(_MainLightPosition.xyz);
     light.distance = 0.0;
-    light.shadowAttenuation = MainLightShadow(inputData.shadowCoord, inputData.positionWS);
+    
+    #if _RECEIVE_SHADOWS
+        light.shadowAttenuation = MainLightShadow(inputData.shadowCoord, inputData.positionWS);
+    
+    #else
+        light.shadowAttenuation = 1;
+    
+    #endif
+    
     return light;
 }
 
