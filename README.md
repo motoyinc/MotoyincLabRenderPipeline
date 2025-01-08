@@ -9,8 +9,6 @@
   - com.unity.render-pipelines.core  **v17.0.3**
   - `关联包体在安装MotoyincLabRP时会自动安装`
 
-## 开发日志
-https://zhuanlan.zhihu.com/p/810720751
  
 ## 安装管线
 ```URL
@@ -25,10 +23,13 @@ https://github.com/motoyinc/MotoyincLabRenderPipeline.git?path=/Packages/com.mot
 
 ---
 
+#### **开发日志 Development logs**
+
+https://zhuanlan.zhihu.com/p/810720751
+
 #### **参考文献 References**
 
 [1] J. Flick, “tutorials for Unity” Catlike Coding, [Online]. Available: [https://catlikecoding.com/unity/tutorials/](https://catlikecoding.com/unity/tutorials/).
 
 [2] Unity Technologies, “Universal Render Pipeline (URP) Source Code,” GitHub repository, 2020. [Online]. Available: [https://github.com/Unity-Technologies/Graphics](https://github.com/Unity-Technologies/Graphics). 
 
-在本项目的开发过程中，我参考并受益于以上资源，在此对其作者和贡献者表示感谢！
