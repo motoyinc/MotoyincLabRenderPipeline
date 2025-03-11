@@ -13,7 +13,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         [SerializeField] ShadowResolution m_MainLightShadowmapResolution = ShadowResolution._1024;
         // 软阴影
         [SerializeField] bool m_SoftShadowsSupported = false;
-        [SerializeField][Range(1,3)] int m_ShadowQuality = 1;
+        [SerializeField]SoftShadowQuality m_ShadowQuality = SoftShadowQuality.PCF_5x5_Tent;
         [SerializeField][Range(0,10)] float m_ShadowDepthBias = 1.0f;
         [SerializeField][Range(0,2)] float m_ShadowNormalBias = 0.3f;
         
@@ -74,8 +74,30 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         public int shadowQuality
         {
-            get => m_ShadowQuality;
-            set => m_ShadowQuality = value;
+            get
+            {
+                if (m_ShadowQuality == SoftShadowQuality.PCF_3x3_Avg)
+                    return 1;
+                if (m_ShadowQuality == SoftShadowQuality.PCF_5x5_Tent)
+                    return 2;
+                if (m_ShadowQuality == SoftShadowQuality.PCF_7x7_Tent)
+                    return 3;
+                if (m_ShadowQuality == SoftShadowQuality.PCSS)
+                    return 4;
+                return 2;
+            }
+            set
+            {
+                if (value == 1)
+                    m_ShadowQuality = SoftShadowQuality.PCF_3x3_Avg;
+                if (value == 2)
+                    m_ShadowQuality = SoftShadowQuality.PCF_5x5_Tent;
+                if (value == 3)
+                    m_ShadowQuality = SoftShadowQuality.PCF_7x7_Tent;
+                if (value == 4)
+                    m_ShadowQuality = SoftShadowQuality.PCSS;
+                m_ShadowQuality = SoftShadowQuality.PCF_5x5_Tent;
+            }
         }
         
         public float shadowDepthBias

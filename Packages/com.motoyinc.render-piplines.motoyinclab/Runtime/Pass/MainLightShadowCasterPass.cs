@@ -17,6 +17,8 @@ namespace UnityEngine.Rendering.MotoyincLab
             public static readonly int _CascadeShadowSplitSpheres2 = Shader.PropertyToID("_CascadeShadowSplitSpheres2");
             public static readonly int _CascadeShadowSplitSpheres3 = Shader.PropertyToID("_CascadeShadowSplitSpheres3");
             public static readonly int _CascadeShadowSplitSphereRadii = Shader.PropertyToID("_CascadeShadowSplitSphereRadii");
+            public static readonly int _MainLightPCSSData0 = Shader.PropertyToID("_MainLightPCSSData0");
+            public static readonly int _MainLightPCSSData1 = Shader.PropertyToID("_MainLightPCSSData1");
         }
         private const string k_MainLightShadowMapTextureName = "_MainLightShadowmapTexture";
         private const int k_MaxCascades = 4;                // 最大联级数量
@@ -34,6 +36,9 @@ namespace UnityEngine.Rendering.MotoyincLab
         private Vector4[] m_CascadeSplitDistances = new Vector4[k_MaxCascades]; // 联级阴影裁切球      .xyz:起始点  .w:距离
         private Matrix4x4[] m_MainLightShadowMatrices;      // 投影矩阵
         private ShadowSliceData[] m_CascadeSlices;          // 综合Shadow数据
+        
+        // private Matrix4x4[] m_DeviceProjectionMatrix = new Matrix4x4[k_MaxCascades];
+        // private Vector4[] m_DeviceProjection = new Vector4[k_MaxCascades];
         
         //Pass管线数据
         private PassData m_PassData;                        
@@ -247,6 +252,12 @@ namespace UnityEngine.Rendering.MotoyincLab
                 m_CascadeSlices[i].projectionMatrix = projectionMatrix;             // 投影矩阵
                 m_CascadeSlices[i].viewMatrix = viewMatrix;                         // 灯光视角矩阵
                 m_CascadeSlices[i].splitData = splitData;                           // 分割数据
+                
+                // 设备矩阵，会根据GPU设备不同，有可能反转Z轴
+                // Matrix4x4 deviceProjectionMatrix = GL.GetGPUProjectionMatrix(projectionMatrix, false);
+                // m_CascadeSlices[i].deviceProjectionMatrix = deviceProjectionMatrix;
+                // m_CascadeSlices[i].deviceProjection = new Vector4(deviceProjectionMatrix.m00, deviceProjectionMatrix.m11, deviceProjectionMatrix.m22, deviceProjectionMatrix.m23);
+
             }
         }
         
@@ -267,10 +278,11 @@ namespace UnityEngine.Rendering.MotoyincLab
             
             // 软阴影支持
             int shadowQuality = 0;
+            bool isSoftShadowsEnable = false;
             if (shadowData.supportsSoftShadows)
             {
                 shadowQuality = shadowData.mainShadowQuality;
-                bool isSoftShadowsEnable = ShadowUtils.SoftShadowQualityToShaderProperty(light, ref shadowQuality);
+                isSoftShadowsEnable = ShadowUtils.SoftShadowQualityToShaderProperty(light, ref shadowQuality);
                 if(isSoftShadowsEnable)
                 {
                     // ShadowTexture尺寸
@@ -337,8 +349,19 @@ namespace UnityEngine.Rendering.MotoyincLab
             cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, data.cameraData.worldSpaceCameraPos);
             cmd.SetKeyword(ShaderGlobalKeywords.MainLightShadows, data.shadowData.mainLightShadowCascadesCount == 1);
             cmd.SetKeyword(ShaderGlobalKeywords.MainLightShadowCascades, data.shadowData.mainLightShadowCascadesCount > 1);
+            
+            
+            
+            // /// 【PCSS】 /// //
+            if (isSoftShadowsEnable && shadowQuality == 4)
+            {
+                Vector4[] pcssData = ShadowUtils.GetDirLightPCSSData(light);
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._MainLightPCSSData0, pcssData[0]);
+                cmd.SetGlobalVector(MainLightShadowConstantBuffer._MainLightPCSSData1, pcssData[1]);
+            }
+            
+            
         }
-
         
     }
 }
