@@ -14,7 +14,15 @@ CBUFFER_END
 
 float4 CustomDebugOutput(float4 output_color, SurfaceData surface, InputData inputData, BRDFData brdf)
 {
-    return output_color;
+    MainLightPCSSData pcssData = GetMainLightPCSSData();
+    real attenuation = 1.0f;
+    attenuation =  SampleShadow_PCSS_Directional(
+        pcssData,
+        inputData.shadowCoord,inputData.positionSS,inputData.positionWS,
+        _MainLightShadowmapTexture,
+        s_linear_clamp_compare_sampler,
+        sampler_MainLightShadowmapTexture);
+    return attenuation;
 }
 
 

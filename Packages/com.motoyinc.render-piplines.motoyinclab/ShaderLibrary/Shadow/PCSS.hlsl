@@ -80,11 +80,6 @@ real2 ComputeFibonacciSpiralDiskSampleClumped_Directional(const in int sampleInd
     return fibonacciSpiralDirection[sampleIndex] * sampleDistNorm;
 }
 
-#define MAX_SHADOW_CASCADES 4
-
-CBUFFER_START(PCSSData)
-    
-CBUFFER_END
 
 struct MainLightPCSSData
 {
@@ -103,9 +98,9 @@ struct MainLightPCSSData
     // shadowmapSize
     float2 texelSize;
     float2 shadowmapSize;
+    
+    float2 shadowmapInAtlasScale;
 };
-
-
 
 
 
@@ -122,8 +117,8 @@ real2 ComputeFibonacciSpiralDiskSampleUniform_Directional(const in int sampleInd
 
 
 
-
-float FindBlocker(
+bool Search_PCSS_Blocker(inout real averageBlocker,
+    float2 shadowmapInAtlasScale,float2 shadowmapInAtlasOffset,
     TEXTURE2D_PARAM(ShadowMap, sampler_ShadowMap),float2 shadowCoord, float receiverDepth,
     float2 searchRadius,float sampleCount,float2 sampleJitter,float clumpExponent)
 {
@@ -132,6 +127,9 @@ float FindBlocker(
     float2 sampleCoord = float2(0.0, 0.0);
     float sampleDepth = 0.0;
     real sampleCountInverse = rcp((real)sampleCount);
+
+    float2 minCoord = shadowmapInAtlasOffset;
+    float2 maxCoord = shadowmapInAtlasOffset + shadowmapInAtlasScale;
 
     for(int i = 0.0; i < sampleCount; ++i)
     {
@@ -142,7 +140,10 @@ float FindBlocker(
                        offset.x * -sampleJitter.x + offset.y * sampleJitter.y);
         
         sampleCoord = shadowCoord + offset * searchRadius;
-        sampleDepth = SAMPLE_TEXTURE2D(ShadowMap, sampler_ShadowMap, sampleCoord).r;
+        if(!any(sampleCoord < minCoord) || any(sampleCoord > maxCoord))
+        {
+            sampleDepth = SAMPLE_TEXTURE2D(ShadowMap, sampler_ShadowMap, sampleCoord).r;
+        }
 
         if(sampleDepth > receiverDepth)
         {
@@ -150,16 +151,28 @@ float FindBlocker(
             ++depthCount;
         }
     }
-
-    return depthCount > FLT_EPS ? (depthSum / depthCount) : 0;
+    if(depthCount > FLT_EPS)
+    {
+        averageBlocker = depthSum / depthCount;
+        return true;
+    }
+    else
+    {
+        averageBlocker = 0;
+        return false;
+    }
+    // return depthCount > FLT_EPS ? (depthSum / depthCount) : 0;
 }
 
-float EstimatePenumbra(float receiverDepth, float avgBlockerDepth, float lightRadius, float shadowMapSize)
+
+float Estimate_PCSS_Penumbra(float receiverDepth, float avgBlockerDepth, float lightRadius, float shadowMapSize)
 {
     return shadowMapSize * (receiverDepth - avgBlockerDepth) * lightRadius / avgBlockerDepth;
 }
 
-float PCF(
+
+float Compute_PCSS_PCF(
+    float2 shadowmapInAtlasScale,float2 shadowmapInAtlasOffset,
     TEXTURE2D_SHADOW_PARAM(ShadowMap, sampler_ShadowMap), float3 shadowCoord,
     float filterRadius,float sampleCount,float2 sampleJitter,float clumpExponent
     )
@@ -167,6 +180,10 @@ float PCF(
     float shadowAttenuationSum = 0.0;
     float3 sampleCoord = float3(0.0, 0.0, shadowCoord.z);
     real sampleCountInverse = rcp((real)sampleCount);
+    float2 minCoord = shadowmapInAtlasOffset;
+    float2 maxCoord = shadowmapInAtlasOffset + shadowmapInAtlasScale;
+
+    
     for(int i = 0; i < sampleCount; ++i)
     {
         real sampleDistNorm;
@@ -175,7 +192,10 @@ float PCF(
         offset = real2(offset.x *  sampleJitter.y + offset.y * sampleJitter.x,
                        offset.x * -sampleJitter.x + offset.y * sampleJitter.y);
         sampleCoord.xy = shadowCoord.xy + offset * filterRadius;
-        shadowAttenuationSum += SAMPLE_TEXTURE2D_SHADOW(ShadowMap, sampler_ShadowMap, sampleCoord.xyz);
+        if(!any(sampleCoord < minCoord) || any(sampleCoord > maxCoord))
+        {
+            shadowAttenuationSum += SAMPLE_TEXTURE2D_SHADOW(ShadowMap, sampler_ShadowMap, sampleCoord.xyz);
+        }
     }
 
     return shadowAttenuationSum / (float)sampleCount;

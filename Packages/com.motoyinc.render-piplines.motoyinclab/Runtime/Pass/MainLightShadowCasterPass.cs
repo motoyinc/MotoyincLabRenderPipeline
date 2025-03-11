@@ -19,6 +19,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             public static readonly int _CascadeShadowSplitSphereRadii = Shader.PropertyToID("_CascadeShadowSplitSphereRadii");
             public static readonly int _MainLightPCSSData0 = Shader.PropertyToID("_MainLightPCSSData0");
             public static readonly int _MainLightPCSSData1 = Shader.PropertyToID("_MainLightPCSSData1");
+            public static readonly int _AtlasOffset = Shader.PropertyToID("_AtlasOffset");
         }
         private const string k_MainLightShadowMapTextureName = "_MainLightShadowmapTexture";
         private const int k_MaxCascades = 4;                // 最大联级数量
@@ -39,6 +40,7 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         // private Matrix4x4[] m_DeviceProjectionMatrix = new Matrix4x4[k_MaxCascades];
         // private Vector4[] m_DeviceProjection = new Vector4[k_MaxCascades];
+        private Vector4[] m_AtlasOffset;
         
         //Pass管线数据
         private PassData m_PassData;                        
@@ -69,6 +71,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             m_PassData = new PassData();
             m_MainLightShadowMatrices = new Matrix4x4[k_MaxCascades + 1];
             m_CascadeSlices = new ShadowSliceData[k_MaxCascades];
+            m_AtlasOffset = new Vector4[k_MaxCascades];
         }
         
         public override void Dispose()
@@ -356,8 +359,38 @@ namespace UnityEngine.Rendering.MotoyincLab
             if (isSoftShadowsEnable && shadowQuality == 4)
             {
                 Vector4[] pcssData = ShadowUtils.GetDirLightPCSSData(light);
+                
+                //-- [shadowmapInAtlasScale]--//
+                // cascadeMapSize
+                float shadowCascadeSize;
+                if (m_ShadowCasterCascadesCount > 1)
+                    shadowCascadeSize = renderTargetWidth/2.0f;
+                else
+                    shadowCascadeSize = renderTargetWidth;
+                // TexelSize
+                float invShadowAtlasHeight = 1.0f / renderTargetHeight;
+                float invShadowAtlasWidth = 1.0f / renderTargetWidth;
+                // cascadeMapSize * TexelSize
+                pcssData[1].z = invShadowAtlasWidth * shadowCascadeSize;
+                pcssData[1].w = invShadowAtlasHeight * shadowCascadeSize;
+                
+                
+                //-- [shadowmapInAtlasOffset]--//
+                // atlasOffset
+                
+                for (int i = 0; i <= cascadeCounts-1; ++i)
+                {
+                    m_AtlasOffset[i].x = renderTargetWidth;
+                    m_AtlasOffset[i].y = renderTargetWidth;
+                    m_AtlasOffset[i].w = m_CascadeSlices[i].offsetX;
+                    m_AtlasOffset[i].z = m_CascadeSlices[i].offsetY;
+                }
+                
+                
+                cmd.SetGlobalVectorArray(MainLightShadowConstantBuffer._AtlasOffset, m_AtlasOffset);
                 cmd.SetGlobalVector(MainLightShadowConstantBuffer._MainLightPCSSData0, pcssData[0]);
                 cmd.SetGlobalVector(MainLightShadowConstantBuffer._MainLightPCSSData1, pcssData[1]);
+                
             }
             
             

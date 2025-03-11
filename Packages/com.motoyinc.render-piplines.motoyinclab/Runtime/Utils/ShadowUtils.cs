@@ -239,7 +239,6 @@ namespace UnityEngine.Rendering.MotoyincLab
         
         internal static Vector4[] GetDirLightPCSSData(Light light)
         {
-
             Vector4[] pcssData = new Vector4[2];
             if (light.TryGetComponent(out MotoyincLabAdditionalLightData additionalLightData))
             {

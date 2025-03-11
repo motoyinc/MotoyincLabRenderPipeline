@@ -55,6 +55,7 @@ CBUFFER_START(LightShadows)
 
     float4      _MainLightPCSSData0;
     float4      _MainLightPCSSData1;
+    float4      _AtlasOffset[MAX_SHADOW_CASCADES];
 CBUFFER_END
 
 
@@ -213,33 +214,41 @@ MainLightPCSSData GetMainLightPCSSData()
     
     mainLightPCSSData.texelSize = _MainLightShadowmapSize.xy;
     mainLightPCSSData.shadowmapSize = _MainLightShadowmapSize.zw;
-        
+    mainLightPCSSData.shadowmapInAtlasScale = _MainLightPCSSData1.zw;
+
     return mainLightPCSSData;
 }
 
-float2 BlockerSearchRadius(float searchRadiusWS)
+
+// 该方法用于获取一个真实尺寸的半径，
+// 以防贴图尺寸大小导致的输出结果不一致
+float2 GetPcssPhysicalRadius(float radiusWS)
 {
-    return searchRadiusWS * _MainLightShadowmapSize.xy / _CascadeShadowSplitSpheres0.w;
+    return radiusWS * _MainLightShadowmapSize.xy / _CascadeShadowSplitSpheres0.w;
 }
 
 float SampleShadow_PCSS_Directional(
     MainLightPCSSData pcssData,
-    float3 shadowCoord, float2 positionSS,
+    float3 shadowCoord, float2 positionSS, float3 positionWS,
     Texture2D ShadowMap, SamplerComparisonState sampler_LinearClampCompare ,SamplerState sampler_ShadowMap
     )
 {
-
-    float2 searchRadius  = BlockerSearchRadius(pcssData.blockerSearchRadiusWS);
+    half cascadeIndex = ComputeCascadeIndex(positionWS);
+    float2 shadowmapInAtlasScale = pcssData.shadowmapInAtlasScale;
+    float2 shadowmapInAtlasOffset = _AtlasOffset[cascadeIndex].zw;
+    
+    float2 searchRadius  = GetPcssPhysicalRadius(pcssData.blockerSearchRadiusWS);
     float receiverDepth = shadowCoord.z;
 
     // 随机旋转
-
     float dither = InterleavedGradientNoise(positionSS, 0)*2*PI;
     float2 sampleJitter = float2(sin(dither), cos(dither));
 
 
     // FindBlocker
-    float avgBlockerDepth  = FindBlocker(
+    float avgBlockerDepth = 0;
+    bool blocker = Search_PCSS_Blocker(avgBlockerDepth,
+        shadowmapInAtlasScale,shadowmapInAtlasOffset,
         ShadowMap, sampler_ShadowMap, shadowCoord, shadowCoord.z,
         searchRadius,
         pcssData.blockerSampleCount,
@@ -248,17 +257,19 @@ float SampleShadow_PCSS_Directional(
     );
 
     // EstimatePenumbra
-    float penumbra = EstimatePenumbra(receiverDepth, avgBlockerDepth, 20, pcssData.texelSize);
+    float2 lightRadius  = GetPcssPhysicalRadius(pcssData.angularDiameter);
+    float penumbra = Estimate_PCSS_Penumbra(receiverDepth, avgBlockerDepth, lightRadius*10000, pcssData.texelSize);
 
     
     // PCF采样
-    float shadow = PCF(
+    float shadow = blocker ? Compute_PCSS_PCF(
+        shadowmapInAtlasScale,shadowmapInAtlasOffset,
         TEXTURE2D_SHADOW_ARGS(ShadowMap, sampler_LinearClampCompare), shadowCoord,
         penumbra,
         pcssData.filterSampleCount,
         sampleJitter,
         pcssData.blockerSamplingClumpExponent
-        );
+        ):1;
     return shadow;
 }
 
@@ -268,7 +279,7 @@ float SampleShadow_PCSS_Directional(
 /////////////////////////////////////////////////////////////////////////////
 
 // 采样 ShadowMap
-real SampleMainLightShadowmap(float4 shadowCoord, ShadowSamplingData samplingData, half4 shadowParams, float2 positionSS)
+real SampleMainLightShadowmap(float4 shadowCoord, ShadowSamplingData samplingData, half4 shadowParams)
 {
     real shadowStrength = shadowParams.x;
     
@@ -281,16 +292,30 @@ real SampleMainLightShadowmap(float4 shadowCoord, ShadowSamplingData samplingDat
         attenuation = SampleShadowmapFilteredMediumQuality(TEXTURE2D_SHADOW_ARGS(_MainLightShadowmapTexture, sampler_LinearClampCompare), shadowCoord, samplingData);
     if(shadowParams.y == SOFT_SHADOW_QUALITY_PCF_HIGH)
         attenuation =  SampleShadowmapFilteredHighQuality(TEXTURE2D_SHADOW_ARGS(_MainLightShadowmapTexture, sampler_LinearClampCompare), shadowCoord, samplingData);
+    attenuation = LerpWhiteTo(attenuation, shadowStrength);
+    return BEYOND_SHADOW_FAR(shadowCoord) ? 1.0 : attenuation;
+}
+
+real SampleMainLightShadowmap(float4 shadowCoord, ShadowSamplingData samplingData, half4 shadowParams, float2 positionSS, float3 positionWS)
+{
+    real shadowStrength = shadowParams.x;
+    
+    real attenuation = 1.0f;
+    if(shadowParams.y == SOFT_SHADOW_QUALITY_OFF)
+        attenuation =  SAMPLE_TEXTURE2D_SHADOW(_MainLightShadowmapTexture, sampler_LinearClampCompare, shadowCoord.xyz);
     if(shadowParams.y == SOFT_SHADOW_QUALITY_PCSS)
     {
         MainLightPCSSData pcssData = GetMainLightPCSSData();
         attenuation =  SampleShadow_PCSS_Directional(
             pcssData,
-            shadowCoord,positionSS,
+            shadowCoord,positionSS, positionWS,
             _MainLightShadowmapTexture,
             s_linear_clamp_compare_sampler,
             sampler_MainLightShadowmapTexture);
     }
+    else
+        return SampleMainLightShadowmap(shadowCoord, samplingData, shadowParams);
+    
     attenuation = LerpWhiteTo(attenuation, shadowStrength);
     return BEYOND_SHADOW_FAR(shadowCoord) ? 1.0 : attenuation;
 }
@@ -317,7 +342,7 @@ float4 TransformWorldToShadowCoord(float3 positionWS)
 }
 
 // 获取主光实时阴影
-half MainLightRealtimeShadow(float4 shadowCoord, float2 positionSS)
+half MainLightRealtimeShadow(float4 shadowCoord, float2 positionSS, float3 positionWS)
 {
     // 主光源阴影关闭时，直接返回常数1
     #if !defined(MAIN_LIGHT_CALCULATE_SHADOWS)
@@ -327,7 +352,7 @@ half MainLightRealtimeShadow(float4 shadowCoord, float2 positionSS)
     #else
         ShadowSamplingData shadowSamplingData = GetMainLightShadowSamplingData();
         half4 shadowParams = GetMainLightShadowParams();
-        return SampleMainLightShadowmap(shadowCoord, shadowSamplingData, shadowParams, positionSS);
+        return SampleMainLightShadowmap(shadowCoord, shadowSamplingData, shadowParams, positionSS, positionWS);
     
     #endif
 }
@@ -357,7 +382,7 @@ half MixRealtimeAndBakedShadows(half realtimeShadow, half bakedShadow, half shad
 half MainLightShadow(float4 shadowCoord, float3 positionWS, float2 positionSS)
 {
     // 获取实时阴影
-    half realtimeShadow = MainLightRealtimeShadow(shadowCoord, positionSS);
+    half realtimeShadow = MainLightRealtimeShadow(shadowCoord, positionSS, positionWS);
 
     
     // 计算最大阴影衰减距离
