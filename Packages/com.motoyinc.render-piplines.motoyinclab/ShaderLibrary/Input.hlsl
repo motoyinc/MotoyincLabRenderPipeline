@@ -9,6 +9,7 @@ struct InputData
     half3   viewDirectionWS;
     float4  shadowCoord;
     half4   shadowMask;
+    float2  positionSS;
 };
 
 #endif

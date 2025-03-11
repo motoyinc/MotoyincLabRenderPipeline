@@ -73,6 +73,7 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     InputData inputData;
     inputData.positionWS = input.positionWS;
     inputData.positionCS = input.positionCS;
+    inputData.positionSS = input.positionCS.xy;
     inputData.normalWS = normalize(input.normalWS);
     inputData.viewDirectionWS = normalize(_WorldSpaceCameraPos - input.positionWS);
     #ifdef _MAIN_LIGHT_SHADOWS_CASCADE

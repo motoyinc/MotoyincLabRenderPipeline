@@ -1,5 +1,6 @@
 ﻿using UnityEngine.Rendering.RenderGraphModule;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine.Experimental.Rendering;
 namespace UnityEngine.Rendering.MotoyincLab
 {
@@ -16,6 +17,9 @@ namespace UnityEngine.Rendering.MotoyincLab
         public int offsetY;
         public int resolution;
         public ShadowSplitData splitData;
+        
+        // public Matrix4x4 deviceProjectionMatrix;
+        // public Vector4 deviceProjection;
             
         public void Clear()
         {
@@ -24,6 +28,9 @@ namespace UnityEngine.Rendering.MotoyincLab
             shadowTransform = Matrix4x4.identity;
             offsetX = offsetY = 0;
             resolution = 1024;
+            
+            // deviceProjectionMatrix = Matrix4x4.identity;
+            // deviceProjection = Vector4.zero;
         }
     }
     
@@ -223,6 +230,38 @@ namespace UnityEngine.Rendering.MotoyincLab
         internal static void SetLightPosition(CommandBuffer cmd, Vector3 lightPosition)
         {
             cmd.SetGlobalVector(ShaderPropertyId.lightPosition, new Vector4(lightPosition.x, lightPosition.y, lightPosition.z, 1.0f));
+        }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///                                               PCSS                                                 ///
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        internal static Vector4[] GetDirLightPCSSData(Light light)
+        {
+            Vector4[] pcssData = new Vector4[2];
+            if (light.TryGetComponent(out MotoyincLabAdditionalLightData additionalLightData))
+            {
+                pcssData[0] = new Vector4(
+                        additionalLightData.blockerSearchRadiusWS,
+                        additionalLightData.blockerSampleCount,
+                        additionalLightData.filterSampleCount,
+                        0.5f * additionalLightData.blockerSamplingClumpExponent
+                    );
+
+                pcssData[1] = new Vector4(
+                    additionalLightData.angularDiameter,
+                    0, 0, 0
+                );
+
+            }
+            else
+            {
+                pcssData[0] = Vector4.zero;
+                pcssData[2] = Vector4.zero;
+            }
+
+            return pcssData;
         }
     }
 }
