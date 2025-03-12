@@ -29,7 +29,7 @@
 #### 🌓 主光影 (Main Shadows)
 - [x]  4 级级联阴影 (Cascaded Shadow Mapping, CSM)
 - [x]  平均 PCF 过滤 (Avg-PCF, Percentage Closer Filtering)
-- [x]  Tent-PCF 过滤
+- [x]  锥型 PCF 过滤 (Tent-PCF, Percentage Closer Filtering)
 - [x]  PCSS 软阴影 (Percentage Closer Soft Shadows)
 
 
