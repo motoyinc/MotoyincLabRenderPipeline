@@ -21,7 +21,7 @@ float OneMinusReflectivity (float metallic) {
     return range - metallic * range;
 }
 
-BRDFData GetBRDF (SurfaceData surface) {
+BRDFData InitializeBRDFData (SurfaceData surface) {
     BRDFData brdf;
     // float oneMinusReflectivity = 1.0 - surface.metallic;
     float oneMinusReflectivity = OneMinusReflectivity(surface.metallic);

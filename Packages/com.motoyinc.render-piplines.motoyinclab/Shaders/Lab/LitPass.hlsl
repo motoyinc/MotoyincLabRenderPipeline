@@ -57,19 +57,19 @@ Varyings LitPassVertex (Attributes input){
 
 float4 LitPassFragment(Varyings input) : SV_TARGET
 {
-    SurfaceData surface;
     UNITY_SETUP_INSTANCE_ID(input);
+    
+    /// 初始化几何信息
+    SurfaceData surface;
     float baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.baseUV);
-    
     float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
-    
-    // 采集几何信息
     surface.color = baseMap * baseColor;
     surface.alpha = baseColor.a;
     surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
     surface.roughness =UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Roughness);
 
-    //环境数据信息收集
+    
+    /// 初始化空间数据
     InputData inputData;
     inputData.positionWS = input.positionWS;
     inputData.positionCS = input.positionCS;
@@ -83,21 +83,25 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     #endif
     inputData.shadowMask = 0.0f;
     
-    //计算光照颜色
-    BRDFData brdf = GetBRDF(surface);
-    float3 color = GetLighting(inputData, brdf);
+
     
+    /// 计算光照颜色
+    float4 color = MotoyincLabFragmentPBR(inputData, surface);
+    
+
     #if defined(_CLIPPING)
     clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
     #endif
 
     
+    /// Debug设置
     #if defined(_DEBUG_MODE)
-        float4 output_color = float4(color,surface.alpha);
+        BRDFData brdf = InitializeBRDFData(surface);
+        float4 output_color = float4(color.xyz,surface.alpha);
         return DebugOutput(output_color, surface, inputData, brdf);
     #endif
     
-    return float4(color,surface.alpha);
+    return color;
 }
 
 #endif
