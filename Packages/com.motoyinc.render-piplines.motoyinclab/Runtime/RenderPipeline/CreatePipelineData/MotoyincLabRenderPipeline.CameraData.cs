@@ -152,5 +152,16 @@ namespace UnityEngine.Rendering.MotoyincLab
 
             return SystemInfo.GetGraphicsFormat(DefaultFormat.LDR);
         }
+        
+        
+        static ScriptableRenderer GetRenderer(Camera camera , MotoyincLabAdditionalCameraData additionalCameraData)
+        {
+            ScriptableRenderer renderer = null;
+            if (additionalCameraData != null)
+                renderer = additionalCameraData.scriptableRenderer;
+            if (renderer == null || camera.cameraType == CameraType.SceneView)
+                renderer = asset.scriptableRenderer;
+            return renderer;
+        }
     }
 }
