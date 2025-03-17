@@ -24,26 +24,76 @@ float3 LightingLambert(InputData inputData, Light light) {
     return diffuse * light.color * light.shadowAttenuation;
 }
 
-float3 GetLighting(InputData inputData, BRDFData brdf, Light light)
+float3 LightingPhysicallyBased(InputData inputData, BRDFData brdf, Light light)
 {
     float3 diffuseIntensity = LightingLambert(inputData, light); 
     return diffuseIntensity * DirectBRDF(inputData, brdf, light);
 }
 
-float3 GetLighting (InputData inputData, BRDFData brdf) {
-    float3 color = 0.0;
-    // 计算直射光
-    color = GetLighting(inputData, brdf, GetMainLight(inputData));
+
+///////////////////////////////////////////////////////////////////////////////
+//                      Lighting Functions                                   //
+//                    照明数据、以及照明数据初始化                                //
+///////////////////////////////////////////////////////////////////////////////
+
+// 光照对象
+struct LightingData
+{
+    half3 mainLightColor;
+    half3 additionalLightsColor;
+
+};
+
+// 创建并初始化 光照对象
+LightingData CreateLightingData(InputData inputData, SurfaceData surfaceData)
+{
+    LightingData lightingData;
+    lightingData.mainLightColor = 0;
+    lightingData.additionalLightsColor = 0;
+
+    return lightingData;
+}
+
+
+// 合并计算 光照结果
+float4 CalculateFinalColor(LightingData lightingData, half alpha)
+{
+    half3 lightingColor = 0;
+    lightingColor += lightingData.mainLightColor;
+    lightingColor += lightingData.additionalLightsColor;
+    return half4(lightingColor, alpha);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                      Fragment Functions                                   //
+//                    合并渲染片元着色器渲染结果                                  //
+///////////////////////////////////////////////////////////////////////////////
+
+// PBR 光照
+half4 MotoyincLabFragmentPBR(InputData inputData, SurfaceData surface)
+{
+    BRDFData brdf = InitializeBRDFData(surface);
+
+    // 初始化灯光对象
+    LightingData lightingData = CreateLightingData(inputData, surface);
+    Light light;
+
     
-    // 累计计算附加光
+    /// 主光源计算
+    light = GetMainLight(inputData);
+    lightingData.mainLightColor = LightingPhysicallyBased(inputData, brdf, light);
+
+    
+    // 附加光源计算
     for(int i = 0 ; i< GetAdditionalLightCount(); ++i)
     {
-        color += GetLighting(inputData, brdf, GetAdditionalLight(i, inputData));
+        light = GetAdditionalLight(i, inputData);
+        lightingData.additionalLightsColor += LightingPhysicallyBased(inputData, brdf, light);
     }
 
-    // 输出灯光
-    // color=pow(color,2.2);
-    return color;
+    /// 合并光源结果
+    return CalculateFinalColor(lightingData, surface.alpha);
 }
 
 #endif
