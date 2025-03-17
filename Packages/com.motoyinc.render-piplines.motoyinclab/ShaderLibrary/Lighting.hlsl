@@ -58,10 +58,10 @@ LightingData CreateLightingData(InputData inputData, SurfaceData surfaceData)
 // 合并计算 光照结果
 float4 CalculateFinalColor(LightingData lightingData, half alpha)
 {
-    half lightingColor = 0;
+    half3 lightingColor = 0;
     lightingColor += lightingData.mainLightColor;
     lightingColor += lightingData.additionalLightsColor;
-    return lightingColor;
+    return half4(lightingColor, alpha);
 }
 
 
