@@ -13,23 +13,32 @@
 #endif
 
 
+// 顶点输入
 struct Attributes {
-    float3 positionOS : POSITION;
-    float3 normalOS : NORMAL;
-    float2 baseUV : TEXCOORD0;
-    UNITY_VERTEX_INPUT_INSTANCE_ID
-};
-struct Varyings {
-    float4 positionCS : SV_POSITION;
-    #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
-        float4 shadowCoord : VAR_SHADOW_UV;
-    #endif
-    float3 positionWS : VAR_POSITION_WS;
-    float3 normalWS : VAR_NORMAL;
-    float2 baseUV : VAR_BASE_UV;
+    float3 positionOS           : POSITION;
+    float3 normalOS             : NORMAL;
+    float2 baseUV               : TEXCOORD0;
+
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
+
+// 片元输入
+struct Varyings {
+    float4 positionCS           : SV_POSITION;
+    
+    #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
+        float4 shadowCoord  : VAR_SHADOW_UV;
+    #endif
+    
+    float3 positionWS           : VAR_POSITION_WS;
+    float3 normalWS             : VAR_NORMAL;
+    float2 baseUV               : VAR_BASE_UV;
+    UNITY_VERTEX_INPUT_INSTANCE_ID
+};
+
+
+// pass input
 TEXTURE2D(_BaseMap);
 SAMPLER(sampler_BaseMap);
 UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
@@ -40,6 +49,8 @@ UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
     UNITY_DEFINE_INSTANCED_PROP(float, _Roughness)
 UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
+
+
 Varyings LitPassVertex (Attributes input){
     Varyings output;
     UNITY_SETUP_INSTANCE_ID(input);
@@ -49,6 +60,8 @@ Varyings LitPassVertex (Attributes input){
     output.normalWS = TransformObjectToWorldNormal(input.normalOS);
     float4 baseST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
     output.baseUV = input.baseUV * baseST.xy + baseST.zw;
+
+    
     #ifndef _MAIN_LIGHT_SHADOWS_CASCADE
     output.shadowCoord = TransformWorldToShadowCoord(output.positionWS);
     #endif
