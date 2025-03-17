@@ -10,6 +10,7 @@ struct InputData
     float4  shadowCoord;
     half4   shadowMask;
     float2  positionSS;
+    float3  bakedGI;
 };
 
 #endif

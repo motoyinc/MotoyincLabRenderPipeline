@@ -11,6 +11,8 @@
 #if UNITY_EDITOR
             data.debugSettings = settings.debugSettings;
 #endif
+
+            data.perObjectData = PerObjectData.Lightmaps;
             
             return data;
         }

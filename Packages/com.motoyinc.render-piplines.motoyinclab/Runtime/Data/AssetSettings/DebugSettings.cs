@@ -27,6 +27,8 @@ namespace UnityEngine.Rendering.MotoyincLab
         // 灯光
         MainLightColor = 30,
         MainLightShadow = 31,
+        IndirectIllumination = 32,
+        DirectIllumination = 33,
         
         // Debug
         DebugOutput = 100
