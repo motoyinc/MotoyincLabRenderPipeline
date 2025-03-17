@@ -36,7 +36,7 @@ namespace UnityEngine.Rendering.MotoyincLab
             RendererListDesc rendererListDesc = new RendererListDesc(shaderTagId, cullingResults, camera)
             {
                 sortingCriteria = SortingCriteria.CommonOpaque, // 渲染顺序
-                rendererConfiguration = PerObjectData.None,     // 附加数据（探针、光照贴图等）
+                rendererConfiguration = motoyincLabRenderingData.perObjectData,     // 附加数据（探针、光照贴图等）
                 renderQueueRange = RenderQueueRange.opaque      // 过滤设置
             };
             RendererList rendererList = context.CreateRendererList(rendererListDesc);

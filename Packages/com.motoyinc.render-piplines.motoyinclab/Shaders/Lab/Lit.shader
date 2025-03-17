@@ -23,6 +23,9 @@
 			ZWrite [_ZWrite]
 			
             HLSLPROGRAM
+            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile _ DYNAMICLIGHTMAP_ON
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile_instancing
             #pragma shader_feature _CLIPPING
             #pragma shader_feature _RECEIVE_SHADOWS

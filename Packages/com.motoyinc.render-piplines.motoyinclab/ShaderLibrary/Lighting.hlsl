@@ -9,6 +9,7 @@
 #include "Shadows.hlsl"
 #include "RealtimeLight.hlsl"
 #include "BRDFData.hlsl"
+#include "GlobalIllumination.hlsl"
 
 // MainLightShadowData GetMainLightShadowData () {
 //     MainLightShadowData data;

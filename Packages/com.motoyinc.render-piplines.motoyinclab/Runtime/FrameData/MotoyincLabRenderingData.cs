@@ -5,6 +5,7 @@
         internal CommandBuffer m_CommandBuffer;
         public CullingResults cullResults;
         public bool supportsDynamicBatching;
+        public PerObjectData perObjectData; 
 #if UNITY_EDITOR
         public DebugSettings debugSettings;
 #endif
@@ -24,6 +25,7 @@
             m_CommandBuffer = default;
             cullResults = default;
             supportsDynamicBatching = default;
+            perObjectData = default;
 #if UNITY_EDITOR
             debugSettings = default;
 #endif

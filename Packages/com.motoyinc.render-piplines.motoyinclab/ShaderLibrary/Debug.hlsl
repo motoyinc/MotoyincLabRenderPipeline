@@ -6,6 +6,7 @@
 #include "BRDFData.hlsl"
 #include "Shadows.hlsl"
 #include "RealtimeLight.hlsl"
+#include "Lighting.hlsl"
 
 CBUFFER_START(_debug)
     int _DisplayShadowCascade;
@@ -14,15 +15,8 @@ CBUFFER_END
 
 float4 CustomDebugOutput(float4 output_color, SurfaceData surface, InputData inputData, BRDFData brdf)
 {
-    MainLightPCSSData pcssData = GetMainLightPCSSData();
-    real attenuation = 1.0f;
-    attenuation =  SampleShadow_PCSS_Directional(
-        pcssData,
-        inputData.shadowCoord,inputData.positionSS,inputData.positionWS,
-        _MainLightShadowmapTexture,
-        s_linear_clamp_compare_sampler,
-        sampler_MainLightShadowmapTexture);
-    return attenuation;
+    output_color = float4(inputData.bakedGI, output_color.w);
+    return output_color;
 }
 
 
@@ -66,6 +60,10 @@ float4 DisplayGBuffer(SurfaceData surface, InputData inputData, BRDFData brdf)
         return float4(mainLight.color,1);
     if(_DisplayGBuffer == 31)
         return mainLight.shadowAttenuation;
+    if(_DisplayGBuffer == 32)
+        return float4(inputData.bakedGI,1);
+    if(_DisplayGBuffer == 33)
+        return MotoyincLabFragmentPBR(inputData, surface);;
     return 0;
 }
 
