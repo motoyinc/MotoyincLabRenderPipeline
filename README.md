@@ -30,7 +30,7 @@
 |  | 聚光照明      | Spot Light，内外角可调                     | ✅ |
 | 🌑 附加光源阴影 | 阴影贴图      | Shadow Map                           | ⬜ |
 |  | 软阴影       | Soft Shadows                         | ⬜ |
-| 🌍 间接光照 | 光照贴图      | Lightmap                             | ⬜ |
+| 🌍 间接光照 | 光照贴图      | Lightmap                             | ✅ |
 |  | 基于图像照明    | IBL, Image-Based Lighting            | ⬜ |
 |  | 球谐函数光照    | SH, Spherical Harmonics              | ⬜ |
 | 🏗️ 静态光 | 阴影遮罩      | Shadow Mask                          | ⬜ |
