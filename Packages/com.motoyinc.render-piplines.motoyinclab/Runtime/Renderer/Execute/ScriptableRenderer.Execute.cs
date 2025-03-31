@@ -43,14 +43,19 @@ namespace UnityEngine.Rendering.MotoyincLab
 #if UNITY_EDITOR
             // 渲染Gizmos
             if (cameraData.isSceneViewCamera)
-                DrawGizmos(context,camera);
+            {
+                SetPerCameraProperties(context, cameraData, camera, cmd);
+                DrawGizmos(context, cmd, camera);
+            }
+            
 #endif
         }
 
 #if UNITY_EDITOR     
-        void DrawGizmos (ScriptableRenderContext context,Camera camera) 
+        void DrawGizmos (ScriptableRenderContext context, CommandBuffer cmd, Camera camera) 
         {
-            if (Handles.ShouldRenderGizmos()) 
+            if (!Handles.ShouldRenderGizmos() || camera.sceneViewFilterMode == Camera.SceneViewFilterMode.ShowFiltered)
+                return;
             {
                 context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
                 context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
