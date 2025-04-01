@@ -114,7 +114,7 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     float4 color = MotoyincLabFragmentPBR(inputData, surface);
     
     inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.dynamicLightmapUV, input.vertexSH, inputData.normalWS);
-    inputData.bakedGI += GET_SH_GI(input.vertexSH);
+    inputData.bakedGI += GET_SH_GI(inputData.positionWS, inputData.normalWS);
 
     color = float4(color + inputData.bakedGI, color.a);
     

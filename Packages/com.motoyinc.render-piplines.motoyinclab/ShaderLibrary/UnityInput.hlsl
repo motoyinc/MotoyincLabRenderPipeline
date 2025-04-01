@@ -28,6 +28,12 @@ CBUFFER_START(UnityPerDraw)
     real4 unity_SHBb;
     real4 unity_SHC;
 
+    // LPPV
+    float4 unity_ProbeVolumeParams;
+    float4x4 unity_ProbeVolumeWorldToObject;
+    float4 unity_ProbeVolumeSizeInv;
+    float4 unity_ProbeVolumeMin;
+
 CBUFFER_END
 
 
@@ -54,5 +60,9 @@ TEXTURE2D_ARRAY(unity_LightmapsInd);
 TEXTURE2D(unity_DynamicDirectionality);
 // TODO ENLIGHTEN: Instanced GI
 // TEXTURE2D_ARRAY(unity_DynamicDirectionality);
+
+// LPPV
+TEXTURE3D_FLOAT(unity_ProbeVolumeSH);
+SAMPLER(samplerunity_ProbeVolumeSH);
 
 #endif

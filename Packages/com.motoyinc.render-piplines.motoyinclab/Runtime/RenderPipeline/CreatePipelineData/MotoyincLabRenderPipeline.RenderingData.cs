@@ -12,7 +12,7 @@
             data.debugSettings = settings.debugSettings;
 #endif
 
-            data.perObjectData = PerObjectData.Lightmaps | PerObjectData.LightProbe;
+            data.perObjectData = PerObjectData.Lightmaps | PerObjectData.LightProbe | PerObjectData.LightProbeProxyVolume;
             
             return data;
         }

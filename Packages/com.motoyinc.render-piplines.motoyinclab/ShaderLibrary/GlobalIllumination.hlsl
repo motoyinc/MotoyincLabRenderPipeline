@@ -164,22 +164,48 @@ half3 SampleLightmap(float2 staticLightmapUV, half3 normalWS)
 #endif
 
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/AmbientProbe.hlsl"
-
+#include "UnityInput.hlsl"
 
 half3 SampleProbeSHVertex(in float3 normalWS)
 {
     return EvaluateAmbientProbeSRGB(normalWS);
 }
 
+
+
+
 // 获取光照探针
 #if defined(LIGHTMAP_ON)
-    #define GET_SH_GI(vertexShName) 0.0f
+    #define GET_SH_GI(positionWS, normalWS) 0.0f
 #else
-    #define GET_SH_GI(vertexShName) vertexShName
+    #define GET_SH_GI(positionWS, normalWS) SampleProbeSH(positionWS, normalWS) 
 #endif
 
 
-
+half3 SampleProbeSH(in float3 positionWS, in float3 normalWS)
+{
+    
+    if (unity_ProbeVolumeParams.x) {
+        return SampleProbeVolumeSH4(
+            TEXTURE3D_ARGS(unity_ProbeVolumeSH, samplerunity_ProbeVolumeSH),
+            positionWS, normalWS,
+            unity_ProbeVolumeWorldToObject,
+            unity_ProbeVolumeParams.y, unity_ProbeVolumeParams.z,
+            unity_ProbeVolumeMin.xyz, unity_ProbeVolumeSizeInv.xyz
+        );
+    }
+    else {
+        float4 coefficients[7];
+        coefficients[0] = unity_SHAr;
+        coefficients[1] = unity_SHAg;
+        coefficients[2] = unity_SHAb;
+        coefficients[3] = unity_SHBr;
+        coefficients[4] = unity_SHBg;
+        coefficients[5] = unity_SHBb;
+        coefficients[6] = unity_SHC;
+        return max(0.0, SampleSH9(coefficients, normalWS));
+    }
+}
 
 
 
