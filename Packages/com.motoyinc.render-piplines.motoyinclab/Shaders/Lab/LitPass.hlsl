@@ -39,7 +39,8 @@ struct Varyings {
     float3 normalWS             : VAR_NORMAL;
     float2 baseUV               : VAR_BASE_UV;
 
-    VERTEX_OUTPUT_LIGHTMAP_UV(staticLightmapUV, vertexSH, 8)
+    VERTEX_OUTPUT_LIGHTMAP_UV(staticLightmapUV, 8)
+    VERTEX_OUTPUT_SH_COLOR(vertexSH, 8)
     VERTEX_OUTPUT_DYNAMIC_LIGHTMAP_UV(dynamicLightmapUV, 9)
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
@@ -75,6 +76,7 @@ Varyings LitPassVertex (Attributes input){
 
     OUTPUT_LIGHTMAP_UV(input.staticLightmapUV, unity_LightmapST, output.staticLightmapUV);
     OUTPUT_DYNAMIC_LIGHTMAP_UV(input.dynamicLightmapUV, unity_DynamicLightmapST, output.dynamicLightmapUV);
+    OUTPUT_SH4(output.normalWS.xyz, output.vertexSH);
     return output;
 }
 
@@ -89,7 +91,7 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     surface.color = baseMap * baseColor;
     surface.alpha = baseColor.a;
     surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
-    surface.roughness =UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Roughness);
+    surface.roughness = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Roughness);
 
     
     /// 初始化空间数据
@@ -112,10 +114,14 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
     float4 color = MotoyincLabFragmentPBR(inputData, surface);
     
     inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.dynamicLightmapUV, input.vertexSH, inputData.normalWS);
+    inputData.bakedGI += GET_SH_GI(input.vertexSH);
+
     color = float4(color + inputData.bakedGI, color.a);
     
+
+
     #if defined(_CLIPPING)
-    clip(baseMap - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
+    clip(baseMap - _Cutoff);
     #endif
 
     

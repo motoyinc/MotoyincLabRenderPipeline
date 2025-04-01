@@ -18,6 +18,16 @@ CBUFFER_START(UnityPerDraw)
 
     float4 unity_LightmapST;
     float4 unity_DynamicLightmapST;
+
+    // SH block feature
+    real4 unity_SHAr;
+    real4 unity_SHAg;
+    real4 unity_SHAb;
+    real4 unity_SHBr;
+    real4 unity_SHBg;
+    real4 unity_SHBb;
+    real4 unity_SHC;
+
 CBUFFER_END
 
 

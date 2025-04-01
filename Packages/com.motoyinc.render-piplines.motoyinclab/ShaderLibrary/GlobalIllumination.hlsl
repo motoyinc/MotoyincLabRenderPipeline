@@ -7,9 +7,9 @@
 
 // Static LightMap
 #if defined(LIGHTMAP_ON)
-    #define VERTEX_OUTPUT_LIGHTMAP_UV(lmName, shName, index) float2 lmName : TEXCOORD##index;
+    #define VERTEX_OUTPUT_LIGHTMAP_UV(lmName, index) float2 lmName : TEXCOORD##index;
 #else
-    #define VERTEX_OUTPUT_LIGHTMAP_UV(lmName, shName, index) float3 shName : TEXCOORD##index;
+    #define VERTEX_OUTPUT_LIGHTMAP_UV(lmName, index)
 #endif
 
 
@@ -140,6 +140,49 @@ half3 SampleLightmap(float2 staticLightmapUV, half3 normalWS)
     // 在没有开启LightMap时 输出一个环境光（一般是天空球的Color，是个二阶SH，可以用来简单表示天光和地光）
     #define SAMPLE_GI(staticLmName, dynamicLmName, shName, normalWSName) half3(0,0,0)
 #endif
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// SH 球谐函数
+////////////////////////////////////////////////////////////////////////////////
+
+// 顶点SH颜色输出
+#if defined(LIGHTMAP_ON)
+    #define VERTEX_OUTPUT_SH_COLOR(shName, index)
+#else
+    #define VERTEX_OUTPUT_SH_COLOR(shName, index) float3 shName : TEXCOORD##index;
+#endif
+
+
+
+// 球谐
+#if defined(LIGHTMAP_ON)
+    #define OUTPUT_SH4(normalWS, OUT)
+#else
+    #define OUTPUT_SH4(normalWS, OUT) OUT.xyz = SampleProbeSHVertex(normalWS)
+#endif
+
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/AmbientProbe.hlsl"
+
+
+half3 SampleProbeSHVertex(in float3 normalWS)
+{
+    return EvaluateAmbientProbeSRGB(normalWS);
+}
+
+// 获取光照探针
+#if defined(LIGHTMAP_ON)
+    #define GET_SH_GI(vertexShName) 0.0f
+#else
+    #define GET_SH_GI(vertexShName) vertexShName
+#endif
+
+
+
+
+
+
 
 
 #endif
